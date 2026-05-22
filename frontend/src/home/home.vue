@@ -4,6 +4,22 @@
 
     <!-- ===== HERO ===== -->
     <section class="hero">
+        <video
+      ref="videoRef"
+      class="hero__video"
+      autoplay
+      muted
+      playsinline
+      preload="auto"
+    >
+      <source
+        :src="heroVideos[currentVideo]"
+        type="video/mp4"
+      />
+    </video>
+
+    <div class="hero__overlay"></div>
+
       <div class="hero__bg-grid"></div>
 
       <div class="hero__sparks">
@@ -43,7 +59,7 @@
 
       <div class="hero__mascot-wrap">
         <div class="hero__mascot-glow"></div>
-        <img :src="logoImg" alt="Sushi Kick" />
+        <img :src="logoImg" class="LogoHero" alt="Sushi Kick" />
       </div>
 
       <div class="hero__scroll-hint">
@@ -228,6 +244,14 @@ import {
   whyItems,
   stats,
   logoImg,
-  sparkStyle
+  sparkStyle,
+  useHeroVideo,
 } from './home.js'
+
+const {
+  videoRef,
+  currentVideo,
+  heroVideos,
+} = useHeroVideo()
+
 </script>
