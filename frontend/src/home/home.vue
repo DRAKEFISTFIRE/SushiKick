@@ -68,25 +68,45 @@
       </div>
     </section>
 
-    <!-- ===== MARQUEE ===== -->
-    <div class="marquee-strip">
-      <div class="marquee-track">
-        <span v-for="i in 3" :key="i">
-          <span class="m-item">🍣 NIGIRI</span>
-          <span class="m-sep">✦</span>
-          <span class="m-item">🌯 TEMAKI</span>
-          <span class="m-sep">✦</span>
-          <span class="m-item">🍱 BENTO</span>
-          <span class="m-sep">✦</span>
-          <span class="m-item">🦐 EDOMAE</span>
-          <span class="m-sep">✦</span>
-          <span class="m-item">🥟 GYOZA</span>
-          <span class="m-sep">✦</span>
-          <span class="m-item">🍜 RAMEN</span>
-          <span class="m-sep">✦</span>
-        </span>
+<div class="marquee-wrapper">
+  <div class="marquee-track">
+
+    <div v-for="i in 3" :key="i" class="marquee-group">
+
+      <div class="food-card nigiri">
+        <div class="overlay"></div>
+        <span class="food-name">NIGIRI</span>
       </div>
+
+      <div class="food-card temaki">
+        <div class="overlay"></div>
+        <span class="food-name">TEMAKI</span>
+      </div>
+
+      <div class="food-card bento">
+        <div class="overlay"></div>
+        <span class="food-name">BENTO</span>
+      </div>
+
+      <div class="food-card edomae">
+        <div class="overlay"></div>
+        <span class="food-name">EDOMAE</span>
+      </div>
+
+      <div class="food-card gyoza">
+        <div class="overlay"></div>
+        <span class="food-name">GYOZA</span>
+      </div>
+
+      <div class="food-card ramen">
+        <div class="overlay"></div>
+        <span class="food-name">RAMEN</span>
+      </div>
+
     </div>
+
+  </div>
+</div>
 
     <!-- ===== FEATURED ===== -->
     <section class="featured">

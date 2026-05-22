@@ -624,6 +624,7 @@ a {
 
 /* Scroll hint */
 .hero__scroll-hint {
+  margin-top: -200px !important;
   position: absolute;
   z-index: 3;
   left: 50%;
@@ -655,46 +656,127 @@ a {
 /* =========================================================
    MARQUEE
 ========================================================= */
-
-.marquee-strip {
-  overflow: hidden;
+.marquee-wrapper {
+  margin-top: -150px;
   width: 100%;
-  padding: 0.9rem 0;
-
-  background: linear-gradient(90deg, var(--sk-red) 0%, #a01810 50%, var(--sk-red) 100%);
-  border-block: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  padding: 1rem 0;
+  background: #0b0b0b;
 }
 
 .marquee-track {
   display: flex;
   width: max-content;
-  animation: marqueeRoll 22s linear infinite;
+  animation: marqueeMove 28s linear infinite;
 }
 
-@keyframes marqueeRoll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-33.33%); }
+.marquee-group {
+  display: flex;
+  gap: 0; /* SIN espacios */
 }
 
-.m-item {
-  padding-inline: 1.6rem;
-  color: rgba(255, 255, 255, 0.92);
-  font-family:    var(--font-display);
-  font-size:      1rem;
-  letter-spacing: 0.2em;
-  white-space: nowrap;
+/* CARD */
+.food-card {
+  position: relative;
+  margin-top: -20px;
+
+  width: 320px;
+  height: 320px;
+
+  flex-shrink: 0;
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+
+  border-radius: 0; /* pegadas */
 }
 
-.m-sep {
-  align-self: center;
-  color: rgba(255, 255, 255, 0.35);
+/* OVERLAY */
+.food-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+
+  transition: .4s ease;
 }
 
+/* TEXTO */
+.food-name {
+  position: absolute;
+  left: 1.5rem;
+  bottom: 1.3rem;
+  z-index: 2;
+
+  color: white;
+
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 0.25em;
+
+  text-transform: uppercase;
+
+  transition: .35s ease;
+}
+
+/* HOVER */
+.food-card:hover::before {
+  background:
+    linear-gradient(
+      to top,
+      rgba(0,0,0,0.55),
+      rgba(0,0,0,0.05)
+    );
+}
+
+.food-card:hover .food-name {
+  transform: translateY(-4px);
+  letter-spacing: 0.32em;
+}
+
+/* IMAGES */
+.nigiri {
+  background-image: url('/images/nigiri.png');
+}
+
+.temaki {
+  background-image: url('/images/temaki.jpeg');
+}
+
+.bento {
+  background-image: url('/images/bento.jpg');
+}
+
+.edomae {
+  background-image: url('/images/edomae.jpg');
+}
+
+.gyoza {
+  background-image: url('/images/gyoza.jpg');
+}
+
+.ramen {
+  background-image: url('/images/ramen.jpg');
+}
+
+/* ANIMATION */
+@keyframes marqueeMove {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
 /* =========================================================
    FEATURED
 ========================================================= */
 
 .featured {
+  margin-top: -90px;
   width: 100%;
   padding-block: clamp(5rem, 9vw, 9rem);
   padding-inline: clamp(1.5rem, 4vw, 4rem);
@@ -907,6 +989,7 @@ a {
 ========================================================= */
 
 .why {
+  margin-top: -130px;
   position: relative;
   overflow: hidden;
   padding: clamp(5rem, 9vw, 9rem) clamp(1.5rem, 4vw, 4rem);

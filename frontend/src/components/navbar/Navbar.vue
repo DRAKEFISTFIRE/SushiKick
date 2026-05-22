@@ -63,11 +63,14 @@ const menuOpen   = ref(false)
 const activeLink = ref('/')
 
 const links = [
-  { href: '/',         label: 'Home',     jp: 'ホーム'        },
-  { href: '/menu',     label: 'Menu',     jp: 'メニュー'       },
-  { href: '/specials', label: 'Specials', jp: '特別'          },
-  { href: '/about',    label: 'About',    jp: '私たちについて'  },
-  { href: '/contact',  label: 'Contact',  jp: '連絡先'        },
+  { href: '/', label: 'Home', jp: 'ホーム' },
+  { href: '/about', label: 'About', jp: '私たちについて' },
+  { href: '/menu', label: 'Menu', jp: 'メニュー' },
+  { href: '/carta', label: 'Carta', jp: 'お品書き' },
+  { href: '/reservations', label: 'Reservations', jp: '予約' },
+  { href: '/contact', label: 'Contact', jp: '連絡先' },
+  { href: '/login', label: 'Login', jp: 'ログイン', auth: true },
+  { href: '/dashboard', label: 'Dashboard', jp: '管理', admin: true },
 ]
 
 function toggleMenu() {
