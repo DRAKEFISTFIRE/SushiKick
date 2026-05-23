@@ -108,50 +108,101 @@
   </div>
 </div>
 
-    <!-- ===== FEATURED ===== -->
-    <section class="featured">
-      <div class="featured__header">
-        <span class="section-tag">今週のおすすめ — WEEKLY PICKS</span>
-        <h2 class="section-title">Signature <em>Rolls</em></h2>
-        <p class="section-sub">Each roll is a battle cry. Find yours.</p>
+<!-- ===== MENU ACCESS ===== -->
+<section class="menu-access">
+  <div class="menu-access__hd">
+    <span class="section-tag">WEEKLY PICKS — 今週のおすすめ</span>
+    <h2 class="section-title">El nostre <em>menú</em></h2>
+    <p class="menu-access__sub">Escull l'experiència que vols viure avui</p>
+  </div>
+  <div class="menu-grid">
+    <a href="/menu" class="menu-panel" style="--accent:#f07b10">
+      <div class="menu-panel__bg" style="background-image:url('/images/menu-full.jpg')"></div>
+      <div class="menu-panel__overlay"></div>
+      <div class="menu-panel__accent"></div>
+      <div class="menu-panel__count">01 / 02</div>
+      <div class="menu-panel__body">
+        <div class="menu-panel__tag">MENÚ COMPLET</div>
+        <div class="menu-panel__title">Tot el menú</div>
+        <p class="menu-panel__desc">Nigiri, temaki, bento, ramen i totes les categories en un sol lloc.</p>
+        <span class="menu-panel__link">Explorar tot →</span>
       </div>
-
-      <div class="featured__grid">
-        <article
-          v-for="roll in rolls"
-          :key="roll.name"
-          class="roll-card"
-          :style="`--card-accent: ${roll.color}`"
-        >
-          <div class="roll-card__emoji-wrap">
-            <span class="roll-card__emoji">{{ roll.emoji }}</span>
-            <div class="roll-card__glow"></div>
-          </div>
-
-          <div class="roll-card__tag">{{ roll.tag }}</div>
-          <h3 class="roll-card__name">{{ roll.name }}</h3>
-          <p class="roll-card__desc">{{ roll.desc }}</p>
-
-          <div class="roll-card__footer">
-            <span class="roll-card__price">{{ roll.price }}</span>
-            <button class="roll-card__btn">Add +</button>
-          </div>
-
-          <div class="roll-card__heat">
-            <span
-              v-for="n in 5"
-              :key="n"
-              class="heat-dot"
-              :class="{ active: n <= roll.heat }"
-            ></span>
-          </div>
-        </article>
+    </a>
+    <a href="/menu/signature" class="menu-panel" style="--accent:#c8201a">
+      <div class="menu-panel__bg" style="background-image:url('/images/signature.jpg')"></div>
+      <div class="menu-panel__overlay"></div>
+      <div class="menu-panel__accent"></div>
+      <div class="menu-panel__count">02 / 02</div>
+      <div class="menu-panel__body">
+        <div class="menu-panel__tag" style="color:#c8201a;border-color:#c8201a">SIGNATURE ROLLS</div>
+        <div class="menu-panel__title">Rolls icònics</div>
+        <p class="menu-panel__desc">Els nostres rolls emblemàtics. Sabors intensos, ingredients premium.</p>
+        <span class="menu-panel__link" style="color:#c8201a;border-color:#c8201a">Descobrir →</span>
       </div>
+    </a>
+  </div>
+</section>
 
-      <div class="featured__cta">
-        <a href="/menu" class="btn-primary">View Full Menu</a>
+
+<!-- ===== CATEGORIES ===== -->
+<section class="s-cats">
+  <div class="cats-grid">
+    <a href="/menu#nigiri" class="cat cat--wide">
+      <div class="cat__bg" style="background-image:url('/images/nigiri.png')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow">→</div>
+      <div class="cat__body">
+        <div class="cat__name">Nigiri</div>
+        <div class="cat__sub">Tradició pura · 12 varietats</div>
       </div>
-    </section>
+    </a>
+    <a href="/menu#temaki" class="cat">
+      <div class="cat__bg" style="background-image:url('/images/temaki.jpeg')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow">→</div>
+      <div class="cat__body">
+        <div class="cat__name">Temaki</div>
+        <div class="cat__sub">Hand rolls</div>
+      </div>
+    </a>
+    <a href="/menu#ramen" class="cat">
+      <div class="cat__bg" style="background-image:url('/images/ramen.jpg')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow">→</div>
+      <div class="cat__body">
+        <div class="cat__name">Ramen</div>
+        <div class="cat__sub">Calent & ric</div>
+      </div>
+    </a>
+    <a href="/menu#gyoza" class="cat">
+      <div class="cat__bg" style="background-image:url('/images/gyoza.jpg')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow">→</div>
+      <div class="cat__body">
+        <div class="cat__name">Gyoza</div>
+        <div class="cat__sub">Cruixent</div>
+      </div>
+    </a>
+    <a href="/menu#bento" class="cat">
+      <div class="cat__bg" style="background-image:url('/images/bento.jpg')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow">→</div>
+      <div class="cat__body">
+        <div class="cat__name">Bento</div>
+        <div class="cat__sub">Complet</div>
+      </div>
+    </a>
+    <a href="/specials" class="cat">
+      <div class="cat__bg" style="background-image:url('/images/edomae.jpg')"></div>
+      <div class="cat__overlay"></div>
+      <div class="cat__arrow" style="color:var(--sk-gold)">★</div>
+      <div class="cat__body">
+        <div class="cat__name" style="color:var(--sk-orange)">Especials</div>
+        <div class="cat__sub">Avui · Temps limitat</div>
+      </div>
+    </a>
+  </div>
+</section>
 
     <!-- ===== WHY ===== -->
     <section class="why">
@@ -192,6 +243,59 @@
         </div>
       </div>
     </section>
+
+    <!-- ===== AUTH ===== -->
+<section class="s-auth">
+  <div class="s-auth__hd">
+    <span class="section-tag">メンバー — MEMBRE</span>
+    <h2 class="section-title">JOIN <em>US</em></h2>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-shell">
+      <div class="auth-tabs">
+        <div class="auth-tab" :class="{ active: authTab === 'login' }" @click="authTab = 'login'">INICIAR SESSIÓ</div>
+        <div class="auth-tab" :class="{ active: authTab === 'register' }" @click="authTab = 'register'">CREAR COMPTE</div>
+      </div>
+      <Transition name="auth-slide" mode="out-in">
+        <div v-if="authTab === 'login'" key="login" class="auth-panel">
+          <label class="f-label">Correu electrònic</label>
+          <input class="f-inp" type="email" placeholder="tu@exemple.com" v-model="loginEmail" />
+          <label class="f-label">Contrasenya</label>
+          <input class="f-inp" type="password" placeholder="••••••••" v-model="loginPass" />
+          <button class="btn-submit">Entrar</button>
+          <div class="auth-or">O CONTINUA AMB</div>
+          <div class="social-grid">
+            <button class="btn-social">G&nbsp; Google</button>
+            <button class="btn-social">Instagram</button>
+          </div>
+          <p class="auth-foot">No tens compte? <span @click="authTab = 'register'">Registra't gratis</span></p>
+        </div>
+        <div v-else key="register" class="auth-panel">
+          <div class="perks">
+            <span class="perk">⚡ Comandes ràpides</span>
+            <span class="perk">★ Punts fidelitat</span>
+            <span class="perk">Accés a exclusius</span>
+          </div>
+          <div class="f-row">
+            <div><label class="f-label">Nom</label><input class="f-inp" type="text" placeholder="Nom" /></div>
+            <div><label class="f-label">Cognoms</label><input class="f-inp" type="text" placeholder="Cognoms" /></div>
+          </div>
+          <label class="f-label">Correu electrònic</label>
+          <input class="f-inp" type="email" placeholder="tu@exemple.com" />
+          <label class="f-label">Contrasenya</label>
+          <input class="f-inp" type="password" placeholder="Mínim 8 caràcters" />
+          <button class="btn-submit">Crear compte</button>
+          <div class="auth-or">O CONTINUA AMB</div>
+          <div class="social-grid">
+            <button class="btn-social">G&nbsp; Google</button>
+            <button class="btn-social">Instagram</button>
+          </div>
+          <p class="auth-foot">Ja tens compte? <span @click="authTab = 'login'">Inicia sessió</span></p>
+        </div>
+      </Transition>
+    </div>
+  </div>
+</section>
 
     <!-- ===== CTA ===== -->
     <section class="cta-band">
@@ -258,6 +362,8 @@
 <script setup>
 import Navbar from '../components/navbar/Navbar.vue'
 import './home.css'
+import { ref } from 'vue'
+
 
 import {
   rolls,
@@ -274,4 +380,7 @@ const {
   heroVideos,
 } = useHeroVideo()
 
+const authTab = ref('login')
+const loginEmail = ref('')
+const loginPass = ref('')
 </script>
