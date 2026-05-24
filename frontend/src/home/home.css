@@ -322,6 +322,12 @@ a {
   z-index: 2;
 }
 
+.LogoHero {
+  margin-top: -10px;
+  height: 750px;
+  width: 780px;
+}
+
 /* Background layers */
 .hero__bg-grid {
   position: absolute;
@@ -467,7 +473,7 @@ a {
 
 /* Visual side */
 .hero__mascot-wrap {
-  margin-left: 300px !important;
+  margin-left: 600px !important;
   position: relative;
   display: flex;
   align-items: center;
