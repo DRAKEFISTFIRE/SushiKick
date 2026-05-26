@@ -592,10 +592,12 @@
 import './login.css'
 
 import {
-  visualStats,
-  perks,
   GoogleIcon,
   InstagramIcon,
+} from './icons.js'
+import {
+  visualStats,
+  perks,
   useAuthForm,
 } from './login.js'
 
