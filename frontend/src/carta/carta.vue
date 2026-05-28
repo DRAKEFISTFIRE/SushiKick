@@ -1,46 +1,46 @@
 <template>
-  <div
-    class="menu-page"
-    @keydown="handleKeydown"
-    tabindex="-1"
-  >
+  <div class="menu-page" tabindex="-1">
     <Navbar />
 
-    <!-- ══════════════════════════════════════
-         HERO STRIP
-    ══════════════════════════════════════ -->
+    <!-- ══════════════════════════════
+         HERO
+    ══════════════════════════════ -->
     <section class="mn-hero">
       <div class="mn-hero__bg"></div>
       <div class="mn-hero__overlay"></div>
       <div class="mn-hero__content container">
         <span class="section-tag">🍣 LA CARTA — MENÚ COMPLET</span>
         <h1 class="mn-hero__title">El nostre <em>menú</em></h1>
-        <p class="mn-hero__sub">Ingredients frescos cada dia. Tècnica japonesa. Ànima de Barcelona.</p>
+        <p class="mn-hero__sub">
+          Ingredients frescos cada dia. Tècnica japonesa. Ànima de Barcelona.
+        </p>
       </div>
     </section>
 
-    <!-- ══════════════════════════════════════
+    <!-- ══════════════════════════════
          STICKY TOOLBAR
-    ══════════════════════════════════════ -->
-    <div class="mn-toolbar" :class="{ sticky: isToolbarSticky }" ref="toolbarRef">
+    ══════════════════════════════ -->
+    <div class="mn-toolbar" :class="{ 'mn-toolbar--stuck': stuck }" ref="toolbarRef">
       <div class="mn-toolbar__inner container">
 
-        <!-- category pills -->
-        <nav class="mn-cats" aria-label="Categories">
+        <!-- CATEGORIES — scroll horizontal en mobile, wrap en desktop -->
+        <nav class="mn-cats" aria-label="Filtrar per categoria">
           <button
             v-for="cat in categories"
             :key="cat.id"
             class="mn-cat-pill"
             :class="{ active: activeCategory === cat.id }"
             @click="activeCategory = cat.id"
+            :aria-pressed="activeCategory === cat.id"
           >
             <span class="mn-cat-pill__icon" aria-hidden="true">{{ cat.icon }}</span>
-            <span>{{ cat.label }}</span>
+            <span class="mn-cat-pill__label">{{ cat.label }}</span>
           </button>
         </nav>
 
-        <!-- search + filters + sort -->
+        <!-- CONTROLS: search · filters · sort -->
         <div class="mn-controls">
+
           <div class="mn-search">
             <span class="mn-search__icon" aria-hidden="true">🔍</span>
             <input
@@ -61,144 +61,182 @@
           <div class="mn-filters">
             <button
               class="mn-filter-btn"
+              :class="{ active: filterFeatured }"
+              @click="filterFeatured = !filterFeatured"
+            >⭐ Destacats</button>
+            <button
+              class="mn-filter-btn"
               :class="{ active: filterSpicy }"
               @click="filterSpicy = !filterSpicy"
-              title="Només picants"
             >🌶 Picant</button>
             <button
               class="mn-filter-btn"
               :class="{ active: filterVegan }"
               @click="filterVegan = !filterVegan"
-              title="Només vegà"
             >🌿 Vegà</button>
           </div>
 
           <select class="mn-sort" v-model="sortBy" aria-label="Ordenar per">
             <option value="default">Ordre per defecte</option>
-            <option value="price-asc">Preu: menor a major</option>
-            <option value="price-desc">Preu: major a menor</option>
+            <option value="price-asc">Preu ↑</option>
+            <option value="price-desc">Preu ↓</option>
           </select>
-        </div>
 
+        </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════════
-         MAIN — PRODUCTS + CART SIDEBAR
-    ══════════════════════════════════════ -->
+    <!-- ══════════════════════════════
+         CONTENT
+    ══════════════════════════════ -->
     <div class="mn-main container">
 
-      <!-- ── Product grid ── -->
+      <!-- Product grid -->
       <main class="mn-grid-col">
 
-        <!-- empty state -->
-        <div v-if="!groupedByCategory.length" class="mn-empty">
-          <span class="mn-empty__icon">🍽</span>
-          <p>Cap plat coincideix amb la teva cerca.</p>
+        <!-- Loading -->
+        <div v-if="loading" class="mn-state">
+          <div class="mn-spinner"></div>
+          <p>Carregant la carta…</p>
+        </div>
+
+        <!-- Error -->
+        <div v-else-if="error" class="mn-state mn-state--error">
+          <span class="mn-state__icon">⚠️</span>
+          <p>{{ error }}</p>
+          <button class="btn-ghost" @click="retryFetch">Tornar a intentar</button>
+        </div>
+
+        <!-- Empty results -->
+        <div v-else-if="!groupedByCategory.length" class="mn-state">
+          <span class="mn-state__icon">🍽</span>
+          <p>Cap plat coincideix amb la cerca.</p>
           <button class="btn-ghost" @click="resetFilters">Esborrar filtres</button>
         </div>
 
-        <!-- category sections -->
-        <section
-          v-for="group in groupedByCategory"
-          :key="group.id"
-          class="mn-section"
-          :id="`cat-${group.id}`"
-        >
-          <div class="mn-section__hd">
-            <span class="mn-section__icon" aria-hidden="true">{{ getCatIcon(group.id) }}</span>
-            <h2 class="mn-section__title">{{ getCatLabel(group.id) }}</h2>
-            <span class="mn-section__count">{{ group.items.length }} plats</span>
-          </div>
+        <!-- Grouped sections -->
+        <template v-else>
+          <section
+            v-for="group in groupedByCategory"
+            :key="group.id"
+            class="mn-section"
+            :id="`cat-${group.id}`"
+          >
+            <!-- section header -->
+            <div class="mn-section__hd">
+              <span class="mn-section__icon" aria-hidden="true">{{ group.icon }}</span>
+              <h2 class="mn-section__title">{{ group.label }}</h2>
+              <span class="mn-section__count">{{ group.items.length }}</span>
+            </div>
 
-          <div class="mn-products">
-            <article
-              v-for="product in group.items"
-              :key="product.id"
-              class="mn-card"
-              :class="{ 'in-cart': qtyInCart(product.id) > 0 }"
-            >
-              <!-- image -->
-              <div class="mn-card__img" @click="openDetail(product)" role="button" :aria-label="`Veure detalls de ${product.name}`">
-                <img :src="product.img" :alt="product.name" loading="lazy" />
-                <div class="mn-card__img-overlay"></div>
+            <!-- product cards -->
+            <div class="mn-products">
+              <article
+                v-for="product in group.items"
+                :key="product.id"
+                class="mn-card"
+                :class="{ 'mn-card--incart': qtyInCart(product.id) > 0 }"
+              >
 
-                <!-- tag badge -->
-                <span
-                  v-if="product.tag"
-                  class="mn-card__tag"
-                  :style="`background: ${product.tag === 'Vegà' ? 'rgba(34,197,94,.15)' : 'rgba(6,4,2,.75)'}; color: ${product.tagColor}; border-color: ${product.tagColor}40`"
-                >{{ product.tag }}</span>
-
-                <!-- new badge -->
-                <span v-if="product.isNew" class="mn-card__new">NOU</span>
-
-                <!-- quick view hint -->
-                <div class="mn-card__view-hint">👁 Veure detalls</div>
-              </div>
-
-              <!-- body -->
-              <div class="mn-card__body">
-                <div class="mn-card__top">
-                  <h3 class="mn-card__name">{{ product.name }}</h3>
-                  <span class="mn-card__price">€{{ product.price.toFixed(2) }}</span>
-                </div>
-
-                <p class="mn-card__desc">{{ product.desc }}</p>
-
-                <!-- heat + calories -->
-                <div class="mn-card__meta">
-                  <div class="mn-card__heat" v-if="product.heat > 0" :title="`Picant: ${product.heat}/5`">
-                    <span
-                      v-for="n in 5"
-                      :key="n"
-                      class="mn-heat-dot"
-                      :class="{ active: n <= product.heat }"
-                    ></span>
+                <!-- image -->
+                <button
+                  class="mn-card__img-btn"
+                  @click="openDetail(product)"
+                  :aria-label="`Veure detalls: ${product.name}`"
+                  tabindex="0"
+                >
+                  <img
+                    v-if="product.img"
+                    :src="product.img"
+                    :alt="product.name"
+                    loading="lazy"
+                    class="mn-card__img"
+                  />
+                  <div v-else class="mn-card__img mn-card__img--placeholder">
+                    <span>🍣</span>
                   </div>
-                  <span class="mn-card__cal">{{ product.calories }} kcal</span>
-                </div>
+                  <div class="mn-card__img-overlay" aria-hidden="true"></div>
 
-                <!-- allergens -->
-                <div class="mn-card__allergens" v-if="product.allergens.length">
                   <span
-                    v-for="a in product.allergens"
-                    :key="a"
-                    class="mn-allergen"
-                    :title="a"
-                  >{{ allergenIcons[a] }}</span>
-                </div>
+                    v-if="product.tag"
+                    class="mn-card__tag"
+                    :style="`color:${product.tagColor}; border-color:${product.tagColor}50`"
+                  >{{ product.tag }}</span>
 
-                <!-- add to cart controls -->
-                <div class="mn-card__footer">
-                  <!-- qty stepper when already in cart -->
-                  <div v-if="qtyInCart(product.id) > 0" class="mn-stepper">
-                    <button class="mn-stepper__btn" @click="updateQty(product.id, -1)" aria-label="Reduir quantitat">−</button>
-                    <span class="mn-stepper__qty">{{ qtyInCart(product.id) }}</span>
-                    <button class="mn-stepper__btn" @click="updateQty(product.id, +1)" aria-label="Augmentar quantitat">+</button>
+                  <span v-if="product.isNew" class="mn-card__badge-new">NOU</span>
+
+                  <div class="mn-card__view-hint" aria-hidden="true">👁 Detalls</div>
+                </button>
+
+                <!-- body -->
+                <div class="mn-card__body">
+                  <div class="mn-card__top">
+                    <h3 class="mn-card__name">{{ product.name }}</h3>
+                    <span class="mn-card__price">€{{ product.price.toFixed(2) }}</span>
                   </div>
 
-                  <!-- add button -->
-                  <button
-                    v-else
-                    class="mn-add-btn"
-                    @click="addToCart(product)"
-                    :aria-label="`Afegir ${product.name} a la comanda`"
-                  >
-                    <span>Afegir</span>
-                    <span class="mn-add-btn__plus" aria-hidden="true">+</span>
-                  </button>
+                  <p v-if="product.desc" class="mn-card__desc">{{ product.desc }}</p>
+
+                  <!-- heat + calories -->
+                  <div class="mn-card__meta">
+                    <div v-if="product.heat > 0" class="mn-heat" :title="`Picant ${product.heat}/5`">
+                      <span
+                        v-for="n in 5"
+                        :key="n"
+                        class="mn-heat__dot"
+                        :class="{ active: n <= product.heat }"
+                      ></span>
+                    </div>
+                    <span v-if="product.calories" class="mn-card__cal">
+                      {{ product.calories }} kcal
+                    </span>
+                  </div>
+
+                  <!-- allergens -->
+                  <div v-if="product.allergens.length" class="mn-card__allergens">
+                    <span
+                      v-for="a in product.allergens"
+                      :key="a"
+                      class="mn-allergen"
+                      :title="a"
+                    >{{ allergenIcons[a] }}</span>
+                  </div>
+
+                  <!-- cart controls -->
+                  <div class="mn-card__footer">
+                    <div v-if="qtyInCart(product.id) > 0" class="mn-stepper">
+                      <button class="mn-stepper__btn" @click="updateQty(product.id, -1)" aria-label="Reduir">−</button>
+                      <span class="mn-stepper__qty">{{ qtyInCart(product.id) }}</span>
+                      <button class="mn-stepper__btn" @click="updateQty(product.id, +1)" aria-label="Augmentar">+</button>
+                    </div>
+                    <button
+                      v-else
+                      class="mn-add-btn"
+                      @click="addToCart(product)"
+                      :aria-label="`Afegir ${product.name}`"
+                    >
+                      Afegir <span aria-hidden="true">+</span>
+                    </button>
+                  </div>
                 </div>
 
-              </div>
-            </article>
-          </div>
-        </section>
+              </article>
+            </div>
+          </section>
+        </template>
 
       </main>
 
-      <!-- ── Cart sidebar (desktop) ── -->
-      <aside class="mn-cart-sidebar" :class="{ open: cartOpen || cartItems.length > 0 }">
+      <!-- Cart sidebar (desktop ≥1100px) -->
+      <aside
+        class="mn-cart-sidebar"
+        :class="{ 'mn-cart-sidebar--visible': cartItems.length > 0 }"
+        aria-label="Comanda actual"
+      >
+        <div class="mn-cart-sidebar__hd">
+          <h2 class="mn-cart-sidebar__title">La teva comanda</h2>
+          <span class="mn-cart-sidebar__count" v-if="cartCount">{{ cartCount }}</span>
+        </div>
         <CartPanel
           :items="cartItems"
           :total="cartTotal"
@@ -210,28 +248,35 @@
 
     </div>
 
-    <!-- ══════════════════════════════════════
-         FLOATING CART BUTTON (mobile)
-    ══════════════════════════════════════ -->
-    <Transition name="cart-fab">
+    <!-- ══════════════════════════════
+         MOBILE FAB
+    ══════════════════════════════ -->
+    <Transition name="fab">
       <button
         v-if="cartCount > 0"
-        class="mn-cart-fab"
-        :class="{ flash: cartFlash }"
-        @click="cartOpen = !cartOpen"
-        :aria-label="`Obrir comanda (${cartCount} productes)`"
+        class="mn-fab"
+        :class="{ 'mn-fab--flash': cartFlash }"
+        @click="cartOpen = true"
+        :aria-label="`Comanda: ${cartCount} productes, €${cartTotal.toFixed(2)}`"
       >
-        <span class="mn-cart-fab__icon">🛒</span>
-        <span class="mn-cart-fab__count">{{ cartCount }}</span>
-        <span class="mn-cart-fab__total">€{{ cartTotal.toFixed(2) }}</span>
+        <span class="mn-fab__icon" aria-hidden="true">🛒</span>
+        <span class="mn-fab__count">{{ cartCount }}</span>
+        <span class="mn-fab__total">€{{ cartTotal.toFixed(2) }}</span>
       </button>
     </Transition>
 
-    <!-- ══════════════════════════════════════
-         MOBILE CART DRAWER
-    ══════════════════════════════════════ -->
+    <!-- ══════════════════════════════
+         MOBILE DRAWER
+    ══════════════════════════════ -->
     <Transition name="drawer">
-      <div v-if="cartOpen" class="mn-drawer-backdrop" @click.self="cartOpen = false">
+      <div
+        v-if="cartOpen"
+        class="mn-drawer-backdrop"
+        @click.self="cartOpen = false"
+        role="dialog"
+        aria-label="Comanda"
+        aria-modal="true"
+      >
         <div class="mn-drawer">
           <div class="mn-drawer__hd">
             <h2 class="mn-drawer__title">La teva comanda</h2>
@@ -248,57 +293,73 @@
       </div>
     </Transition>
 
-    <!-- ══════════════════════════════════════
-         PRODUCT DETAIL MODAL
-    ══════════════════════════════════════ -->
+    <!-- ══════════════════════════════
+         PRODUCT MODAL
+    ══════════════════════════════ -->
     <Transition name="modal">
-      <div v-if="detailProduct" class="mn-modal-backdrop" @click.self="closeDetail">
-        <div class="mn-modal" role="dialog" :aria-label="detailProduct.name">
+      <div
+        v-if="detailProduct"
+        class="mn-modal-backdrop"
+        @click.self="closeDetail"
+        role="dialog"
+        :aria-label="detailProduct.name"
+        aria-modal="true"
+      >
+        <div class="mn-modal">
           <button class="mn-modal__close" @click="closeDetail" aria-label="Tancar">✕</button>
 
+          <!-- image -->
           <div class="mn-modal__img">
-            <img :src="detailProduct.img" :alt="detailProduct.name" />
+            <img
+              v-if="detailProduct.img"
+              :src="detailProduct.img"
+              :alt="detailProduct.name"
+            />
+            <div v-else class="mn-modal__img-placeholder"><span>🍣</span></div>
             <span
               v-if="detailProduct.tag"
               class="mn-card__tag"
-              :style="`color: ${detailProduct.tagColor}; border-color: ${detailProduct.tagColor}40; background: rgba(6,4,2,.8)`"
+              :style="`color:${detailProduct.tagColor}; border-color:${detailProduct.tagColor}50; background:rgba(6,4,2,.8)`"
             >{{ detailProduct.tag }}</span>
           </div>
 
+          <!-- body -->
           <div class="mn-modal__body">
             <h2 class="mn-modal__name">{{ detailProduct.name }}</h2>
-            <p class="mn-modal__desc">{{ detailProduct.desc }}</p>
+            <p v-if="detailProduct.desc" class="mn-modal__desc">{{ detailProduct.desc }}</p>
 
-            <div class="mn-modal__row">
-              <div class="mn-modal__info-item">
-                <span class="mn-modal__info-label">Calories</span>
-                <span class="mn-modal__info-val">{{ detailProduct.calories }} kcal</span>
+            <!-- meta -->
+            <div class="mn-modal__meta">
+              <div v-if="detailProduct.calories" class="mn-modal__meta-item">
+                <span class="mn-modal__meta-label">Calories</span>
+                <span class="mn-modal__meta-val">{{ detailProduct.calories }} kcal</span>
               </div>
-              <div class="mn-modal__info-item" v-if="detailProduct.heat > 0">
-                <span class="mn-modal__info-label">Picant</span>
-                <div class="mn-card__heat">
+              <div v-if="detailProduct.heat > 0" class="mn-modal__meta-item">
+                <span class="mn-modal__meta-label">Picant</span>
+                <div class="mn-heat">
                   <span
                     v-for="n in 5"
                     :key="n"
-                    class="mn-heat-dot"
+                    class="mn-heat__dot"
                     :class="{ active: n <= detailProduct.heat }"
                   ></span>
                 </div>
               </div>
             </div>
 
-            <div class="mn-modal__allergens" v-if="detailProduct.allergens.length">
-              <p class="mn-modal__info-label">Al·lèrgens</p>
+            <!-- allergens -->
+            <div v-if="detailProduct.allergens.length" class="mn-modal__allergens">
+              <p class="mn-modal__meta-label">Al·lèrgens</p>
               <div class="mn-modal__allergen-list">
                 <span
                   v-for="a in detailProduct.allergens"
                   :key="a"
                   class="mn-allergen mn-allergen--lg"
-                  :title="a"
                 >{{ allergenIcons[a] }} {{ a }}</span>
               </div>
             </div>
 
+            <!-- footer -->
             <div class="mn-modal__footer">
               <span class="mn-modal__price">€{{ detailProduct.price.toFixed(2) }}</span>
 
@@ -308,9 +369,12 @@
                 <button class="mn-stepper__btn" @click="updateQty(detailProduct.id, +1)">+</button>
               </div>
 
-              <button v-else class="mn-add-btn mn-add-btn--lg" @click="addToCart(detailProduct); closeDetail()">
-                <span>Afegir a la comanda</span>
-                <span class="mn-add-btn__plus" aria-hidden="true">+</span>
+              <button
+                v-else
+                class="mn-add-btn mn-add-btn--lg"
+                @click="addToCart(detailProduct); closeDetail()"
+              >
+                Afegir a la comanda <span aria-hidden="true">+</span>
               </button>
             </div>
           </div>
@@ -326,19 +390,18 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Navbar from '../components/navbar/Navbar.vue'
 import CartPanel from './Panel.vue'
 import './carta.css'
-import {
-  categories,
-  allergenIcons,
-  useMenu,
-} from './carta.js'
+import { allergenIcons, useMenu } from './carta.js'
 
 const {
+  loading,
+  error,
+  categories,
   activeCategory,
   searchQuery,
+  sortBy,
   filterSpicy,
   filterVegan,
-  sortBy,
-  filtered,
+  filterFeatured,
   groupedByCategory,
   cartItems,
   cartOpen,
@@ -356,38 +419,44 @@ const {
   handleKeydown,
 } = useMenu()
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Filter helpers ────────────────────────────────────────────────────────────
 
-function getCatIcon(id) {
-  return categories.find(c => c.id === id)?.icon ?? '🍽'
-}
-function getCatLabel(id) {
-  return categories.find(c => c.id === id)?.label ?? id
-}
 function resetFilters() {
   activeCategory.value = 'all'
   searchQuery.value    = ''
   filterSpicy.value    = false
   filterVegan.value    = false
+  filterFeatured.value = false
   sortBy.value         = 'default'
+}
+
+// Exposed for the error state retry button
+function retryFetch() {
+  // Re-trigger by clearing error and remounting — or call fetchProducts directly
+  // if you export it; for now just reload the page logic by resetting filters
+  window.location.reload()
 }
 
 // ── Sticky toolbar ────────────────────────────────────────────────────────────
 
-const toolbarRef      = ref(null)
-const isToolbarSticky = ref(false)
+const toolbarRef = ref(null)
+const stuck      = ref(false)
 
-function onScroll() {
-  if (!toolbarRef.value) return
-  isToolbarSticky.value = toolbarRef.value.getBoundingClientRect().top <= 0
-}
+let observer = null
 
 onMounted(() => {
-  window.addEventListener('scroll', onScroll, { passive: true })
+  // Use IntersectionObserver instead of scroll listener — zero jank
+  observer = new IntersectionObserver(
+    ([entry]) => { stuck.value = !entry.isIntersecting },
+    { threshold: 0, rootMargin: `-${getComputedStyle(document.documentElement).getPropertyValue('--nav-h') || '72px'} 0px 0px 0px` },
+  )
+  if (toolbarRef.value) observer.observe(toolbarRef.value)
+
   window.addEventListener('keydown', handleKeydown)
 })
+
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
+  observer?.disconnect()
   window.removeEventListener('keydown', handleKeydown)
 })
 </script>

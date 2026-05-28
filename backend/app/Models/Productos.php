@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Categorias;
 
 class Productos extends Model
 {
@@ -28,4 +29,9 @@ class Productos extends Model
         'activo' => 'boolean',
         'destacado' => 'boolean',
     ];
+
+    public function categoria()
+    {
+        return $this->belongsTo(Categorias::class, 'categoria_id');
+    }
 }
