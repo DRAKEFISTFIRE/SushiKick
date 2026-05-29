@@ -114,6 +114,8 @@
           <button class="btn-ghost" @click="resetFilters">Esborrar filtres</button>
         </div>
 
+            
+
         <!-- Grouped sections -->
         <template v-else>
           <section
@@ -128,6 +130,8 @@
               <h2 class="mn-section__title">{{ group.label }}</h2>
               <span class="mn-section__count">{{ group.items.length }}</span>
             </div>
+
+       
 
             <!-- product cards -->
             <div class="mn-products">
@@ -225,6 +229,8 @@
           </section>
         </template>
 
+        
+
       </main>
 
       <!-- Cart sidebar (desktop ≥1100px) -->
@@ -264,6 +270,40 @@
         <span class="mn-fab__total">€{{ cartTotal.toFixed(2) }}</span>
       </button>
     </Transition>
+
+  <transition name="fade">
+  <div v-if="authModalOpen" class="auth-overlay">
+    <div class="auth-modal">
+
+      <div class="auth-icon">🔒</div>
+
+      <h2 class="auth-title">
+        Authentication Required
+      </h2>
+
+      <p class="auth-text">
+        {{ authMessage }}
+      </p>
+
+      <div class="auth-actions">
+        <button
+          class="auth-btn auth-btn--primary"
+          @click="$router.push('/login')"
+        >
+          Log In
+        </button>
+
+        <button
+          class="auth-btn auth-btn--secondary"
+          @click="authModalOpen = false"
+        >
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+</transition>
 
     <!-- ══════════════════════════════
          MOBILE DRAWER
@@ -417,7 +457,11 @@ const {
   openDetail,
   closeDetail,
   handleKeydown,
+  authModalOpen,
+  authMessage
 } = useMenu()
+
+
 
 // ── Filter helpers ────────────────────────────────────────────────────────────
 

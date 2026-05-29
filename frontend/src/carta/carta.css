@@ -1083,6 +1083,120 @@
 .modal-enter-from .mn-modal { transform: scale(.93) translateY(18px); }
 .modal-leave-to   .mn-modal { transform: scale(.96) translateY(8px); }
 
+/* ═══════════════════════════════════════
+   AUTH MODAL — DARK ORANGE THEME
+═══════════════════════════════════════ */
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(10px);
+
+  z-index: 999999;
+}
+
+/* Modal card */
+.auth-modal {
+  width: min(420px, 92vw);
+  background: linear-gradient(
+    160deg,
+    rgba(18, 12, 10, 0.98),
+    rgba(6, 4, 4, 1)
+  );
+
+  border-radius: 24px;
+  padding: 28px;
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.65);
+
+  text-align: center;
+
+  animation: authPop 0.25s ease;
+}
+
+/* Icon */
+.auth-icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+  color: var(--sk-orange);
+}
+
+/* Text */
+.auth-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--sk-white);
+  letter-spacing: 0.02em;
+}
+
+.auth-text {
+  font-size: 14px;
+  color: rgba(255, 248, 240, 0.55);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+/* Buttons */
+.auth-actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Base button */
+.auth-btn {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s ease;
+  letter-spacing: 0.04em;
+}
+
+/* Primary — naranja oscuro elegante */
+.auth-btn--primary {
+  background: linear-gradient(135deg, var(--sk-red), var(--sk-orange));
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 25px rgba(200, 32, 26, 0.25);
+}
+
+.auth-btn--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 35px rgba(200, 32, 26, 0.35);
+}
+
+/* Secondary — dark glass */
+.auth-btn--secondary {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 248, 240, 0.7);
+}
+
+.auth-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--sk-white);
+}
+
+/* Animation */
+@keyframes authPop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 
 /* =========================================================
    15. RESPONSIVE

@@ -159,10 +159,14 @@ export function useAuthForm() {
       // Guardar token
       localStorage.setItem('token', data.token)
 
-      // Guardar usuario
+      // Guardar usuario completo
       localStorage.setItem('user', JSON.stringify(data.user))
 
-      // Guardar autenticación
+      // Guardar ID directamente (más cómodo)
+      if (data.user?.id) {
+        localStorage.setItem('user_id', String(data.user.id))
+      }
+            // Guardar autenticación
       localStorage.setItem('isAuthenticated', 'true')
 
       console.log('LOGIN OK', data)
@@ -277,8 +281,13 @@ export function useAuthForm() {
       // Guardar token
       localStorage.setItem('token', data.token)
 
-      // Guardar usuario
+      // Guardar usuario completo
       localStorage.setItem('user', JSON.stringify(data.user))
+
+      // Guardar ID directamente
+      if (data.user?.id) {
+        localStorage.setItem('user_id', String(data.user.id))
+      }
 
       // Guardar autenticación
       localStorage.setItem('isAuthenticated', 'true')

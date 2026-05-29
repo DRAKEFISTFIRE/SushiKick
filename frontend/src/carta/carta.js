@@ -1,30 +1,31 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 const API_URL = 'http://127.0.0.1:8000/api'
+const CART_KEY = 'cart_items'
 
 // ─── Static data ──────────────────────────────────────────────────────────────
 
 export const allergenIcons = {
-  gluten:    '🌾',
-  peix:      '🐟',
-  soja:      '🫘',
-  lactis:    '🥛',
-  ou:        '🥚',
+  gluten: '🌾',
+  peix: '🐟',
+  soja: '🫘',
+  lactis: '🥛',
+  ou: '🥚',
   crustacis: '🦐',
-  sèsam:    '🌱',
+  sèsam: '🌱',
 }
 
 // Category icon map — used to enrich API data
 const CATEGORY_ICONS = {
-  nigiri:    '🍣',
-  temaki:    '🌯',
-  ramen:     '🍜',
-  gyoza:     '🥟',
-  bento:     '🍱',
+  nigiri: '🍣',
+  temaki: '🌯',
+  ramen: '🍜',
+  gyoza: '🥟',
+  bento: '🍱',
   signature: '⭐',
-  drinks:    '🍵',
-  begudes:   '🍵',
-  default:   '🍽',
+  drinks: '🍵',
+  begudes: '🍵',
+  default: '🍽',
 }
 
 function getCategoryIcon(name = '') {
@@ -33,43 +34,65 @@ function getCategoryIcon(name = '') {
 }
 
 // ─── Composable ───────────────────────────────────────────────────────────────
-// All state is created inside — fresh per component instance, no module-level refs.
 
 export function useMenu() {
-
   // ── Remote state ────────────────────────────────────────────────────────────
-  const loading  = ref(false)
-  const error    = ref(null)
+  const loading = ref(false)
+  const error = ref(null)
   const products = ref([])
   const categories = ref([{ id: 'all', label: 'Tot', icon: '🍽' }])
 
   // ── Filter / sort state ─────────────────────────────────────────────────────
-  const activeCategory  = ref('all')
-  const searchQuery     = ref('')
-  const sortBy          = ref('default')
-  const filterSpicy     = ref(false)
-  const filterVegan     = ref(false)
-  const filterFeatured  = ref(false)
+  const activeCategory = ref('all')
+  const searchQuery = ref('')
+  const sortBy = ref('default')
+  const filterSpicy = ref(false)
+  const filterVegan = ref(false)
+  const filterFeatured = ref(false)
 
   // ── UI state ────────────────────────────────────────────────────────────────
   const detailProduct = ref(null)
-  const cartItems     = ref([])
-  const cartOpen      = ref(false)
-  const cartFlash     = ref(false)
+  const cartItems = ref([])
+  const cartOpen = ref(false)
+  const cartFlash = ref(false)
+  const authModalOpen = ref(false)
+  const authMessage = ref('')
+
+  // ── LocalStorage Cart Persistence ──────────────────────────────────────────
+
+  function loadCart() {
+    try {
+      const savedCart = localStorage.getItem(CART_KEY)
+
+      if (savedCart) {
+        cartItems.value = JSON.parse(savedCart)
+      }
+    } catch (e) {
+      console.error('loadCart:', e)
+    }
+  }
+
+  watch(
+    cartItems,
+    (newCart) => {
+      localStorage.setItem(CART_KEY, JSON.stringify(newCart))
+    },
+    { deep: true }
+  )
 
   // ── Fetch ───────────────────────────────────────────────────────────────────
 
   async function fetchCategories() {
     try {
-      const res  = await fetch(`${API_URL}/categorias`)
+      const res = await fetch(`${API_URL}/categorias`)
       const json = await res.json()
 
       categories.value = [
         { id: 'all', label: 'Tot', icon: '🍽' },
         ...json.data.map(c => ({
-          id:    c.nombre.trim().toLowerCase(),
+          id: c.nombre.trim().toLowerCase(),
           label: c.nombre,
-          icon:  getCategoryIcon(c.nombre),
+          icon: getCategoryIcon(c.nombre),
         })),
       ]
     } catch (e) {
@@ -79,27 +102,30 @@ export function useMenu() {
 
   async function fetchProducts() {
     loading.value = true
-    error.value   = null
+    error.value = null
+
     try {
-      const res  = await fetch(`${API_URL}/productos`)
+      const res = await fetch(`${API_URL}/productos`)
       const json = await res.json()
 
       products.value = json.data.map(p => ({
-        id:       p.id,
-        name:     p.nombre,
-        desc:     p.info   ?? '',
-        price:    Number(p.precio),
+        id: p.id,
+        name: p.nombre,
+        desc: p.info ?? '',
+        price: Number(p.precio),
         img: p.imagen_url || null,
         category: p.categoria?.nombre?.trim().toLowerCase() ?? 'general',
         featured: Boolean(p.destacado),
-        // Fields the API doesn't provide yet — default values
-        heat:      0,
-        calories:  0,
+
+        // Default values
+        heat: 0,
+        calories: 0,
         allergens: [],
-        isNew:     false,
-        isSpicy:   false,
-        tag:       p.destacado ? 'Destacat' : null,
-        tagColor:  p.destacado ? '#f07b10'  : null,
+        isNew: false,
+        isSpicy: false,
+
+        tag: p.destacado ? 'Destacat' : null,
+        tagColor: p.destacado ? '#f07b10' : null,
       }))
     } catch (e) {
       error.value = 'Error carregant la carta. Torna-ho a intentar.'
@@ -109,7 +135,7 @@ export function useMenu() {
     }
   }
 
-  // ── Derived: filtered list ───────────────────────────────────────────────────
+  // ── Derived: filtered list ─────────────────────────────────────────────────
 
   const filtered = computed(() => {
     let list = [...products.value]
@@ -119,27 +145,41 @@ export function useMenu() {
     }
 
     const q = searchQuery.value.trim().toLowerCase()
+
     if (q) {
-      list = list.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.desc.toLowerCase().includes(q),
+      list = list.filter(
+        p =>
+          p.name.toLowerCase().includes(q) ||
+          p.desc.toLowerCase().includes(q)
       )
     }
 
-    if (filterFeatured.value) list = list.filter(p => p.featured)
-    if (filterSpicy.value)    list = list.filter(p => p.isSpicy)
-    if (filterVegan.value)    list = list.filter(p => p.tag === 'Vegà')
+    if (filterFeatured.value) {
+      list = list.filter(p => p.featured)
+    }
 
-    if (sortBy.value === 'price-asc')  list.sort((a, b) => a.price - b.price)
-    if (sortBy.value === 'price-desc') list.sort((a, b) => b.price - a.price)
+    if (filterSpicy.value) {
+      list = list.filter(p => p.isSpicy)
+    }
+
+    if (filterVegan.value) {
+      list = list.filter(p => p.tag === 'Vegà')
+    }
+
+    if (sortBy.value === 'price-asc') {
+      list.sort((a, b) => a.price - b.price)
+    }
+
+    if (sortBy.value === 'price-desc') {
+      list.sort((a, b) => b.price - a.price)
+    }
 
     return list
   })
 
-  // ── Derived: grouped by category for section headers ────────────────────────
+  // ── Derived: grouped by category ───────────────────────────────────────────
 
   const groupedByCategory = computed(() => {
-    // Single category selected → one group, no need to iterate all cats
     if (activeCategory.value !== 'all') {
       return filtered.value.length
         ? [{ id: activeCategory.value, items: filtered.value }]
@@ -150,7 +190,11 @@ export function useMenu() {
       .filter(c => c.id !== 'all')
       .reduce((acc, cat) => {
         const items = filtered.value.filter(p => p.category === cat.id)
-        if (items.length) acc.push({ ...cat, items })
+
+        if (items.length) {
+          acc.push({ ...cat, items })
+        }
+
         return acc
       }, [])
   })
@@ -158,52 +202,91 @@ export function useMenu() {
   // ── Cart ────────────────────────────────────────────────────────────────────
 
   function addToCart(product) {
-    const existing = cartItems.value.find(i => i.product.id === product.id)
+    const isAuthenticated = localStorage.getItem('isAuthenticated')
+
+    if (isAuthenticated !== 'true') {
+      authMessage.value =
+        'You need to log in or create an account to place an order.'
+
+      authModalOpen.value = true
+
+      return
+    }
+
+    const existing = cartItems.value.find(
+      i => i.product.id === product.id
+    )
+
     if (existing) {
       existing.qty++
     } else {
-      cartItems.value.push({ product, qty: 1 })
+      cartItems.value.push({
+        product,
+        qty: 1,
+      })
     }
+
     // visual flash feedback
     cartFlash.value = true
-    setTimeout(() => { cartFlash.value = false }, 500)
+
+    setTimeout(() => {
+      cartFlash.value = false
+    }, 500)
   }
 
   function removeFromCart(id) {
-    cartItems.value = cartItems.value.filter(i => i.product.id !== id)
+    cartItems.value = cartItems.value.filter(
+      i => i.product.id !== id
+    )
   }
 
   function updateQty(id, delta) {
-    const item = cartItems.value.find(i => i.product.id === id)
+    const item = cartItems.value.find(
+      i => i.product.id === id
+    )
+
     if (!item) return
+
     item.qty += delta
-    if (item.qty <= 0) removeFromCart(id)
+
+    if (item.qty <= 0) {
+      removeFromCart(id)
+    }
   }
 
   function clearCart() {
     cartItems.value = []
+    localStorage.removeItem(CART_KEY)
   }
 
   const cartCount = computed(() =>
-    cartItems.value.reduce((sum, i) => sum + i.qty, 0),
+    cartItems.value.reduce((sum, i) => sum + i.qty, 0)
   )
 
   const cartTotal = computed(() =>
-    cartItems.value.reduce((sum, i) => sum + i.qty * i.product.price, 0),
+    cartItems.value.reduce(
+      (sum, i) => sum + i.qty * i.product.price,
+      0
+    )
   )
 
   function qtyInCart(id) {
-    return cartItems.value.find(i => i.product.id === id)?.qty ?? 0
+    return (
+      cartItems.value.find(i => i.product.id === id)?.qty ?? 0
+    )
   }
 
   // ── Modal ───────────────────────────────────────────────────────────────────
 
-  function openDetail(product)  { detailProduct.value = product }
-  function closeDetail()        { detailProduct.value = null    }
+  function openDetail(product) {
+    detailProduct.value = product
+  }
 
-  // ── Keyboard ─────────────────────────────────────────────────────────────────
-  // Registered in the component (onMounted/onUnmounted) so it's tied to the
-  // component lifecycle — not a loose global listener.
+  function closeDetail() {
+    detailProduct.value = null
+  }
+
+  // ── Keyboard ────────────────────────────────────────────────────────────────
 
   function handleKeydown(e) {
     if (e.key === 'Escape') {
@@ -212,16 +295,21 @@ export function useMenu() {
     }
   }
 
-  // ── Lifecycle ────────────────────────────────────────────────────────────────
+  // ── Lifecycle ───────────────────────────────────────────────────────────────
 
   onMounted(async () => {
+    loadCart()
+
     await fetchCategories()
     await fetchProducts()
   })
 
-  // ── Public API ───────────────────────────────────────────────────────────────
+  // ── Public API ──────────────────────────────────────────────────────────────
 
   return {
+    authModalOpen,
+    authMessage,
+
     // remote
     loading,
     error,

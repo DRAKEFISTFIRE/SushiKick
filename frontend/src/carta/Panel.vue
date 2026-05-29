@@ -47,10 +47,13 @@
       </div>
 
       <div class="cart-actions">
-        <button class="cart-checkout-btn">
+        <RouterLink
+          to="/pedido"
+          class="cart-checkout-btn"
+        >
           Confirmar comanda
           <span aria-hidden="true">→</span>
-        </button>
+        </RouterLink>
         <button class="cart-clear-btn" @click="$emit('clear')">Buidar comanda</button>
       </div>
 
@@ -59,6 +62,7 @@
 </template>
 
 <script setup>
+import './carta.js'
 defineProps({
   items: { type: Array, required: true },
   total: { type: Number, required: true },
