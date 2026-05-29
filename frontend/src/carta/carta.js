@@ -89,7 +89,7 @@ export function useMenu() {
         name:     p.nombre,
         desc:     p.info   ?? '',
         price:    Number(p.precio),
-        img:      p.imagen || null,
+        img: p.imagen_url || null,
         category: p.categoria?.nombre?.trim().toLowerCase() ?? 'general',
         featured: Boolean(p.destacado),
         // Fields the API doesn't provide yet — default values
