@@ -162,6 +162,9 @@ export function useAuthForm() {
       // Guardar usuario
       localStorage.setItem('user', JSON.stringify(data.user))
 
+      // Guardar autenticación
+      localStorage.setItem('isAuthenticated', 'true')
+
       console.log('LOGIN OK', data)
 
       // Redirección
@@ -276,6 +279,9 @@ export function useAuthForm() {
 
       // Guardar usuario
       localStorage.setItem('user', JSON.stringify(data.user))
+
+      // Guardar autenticación
+      localStorage.setItem('isAuthenticated', 'true')
 
       console.log('REGISTER OK', data)
 
