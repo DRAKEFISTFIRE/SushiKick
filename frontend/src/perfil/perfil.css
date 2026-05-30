@@ -1,0 +1,780 @@
+/* =========================================================
+   perfil.css
+   Depends on home.css: :root tokens, .container,
+   .btn-primary, .btn-ghost
+========================================================= */
+
+
+/* =========================================================
+   00. UTILITIES
+========================================================= */
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+
+/* =========================================================
+   01. PAGE SHELL
+========================================================= */
+
+.pf-page {
+  background: var(--sk-black);
+  color: var(--sk-cream);
+  min-height: 100svh;
+}
+
+
+/* =========================================================
+   02. LOADING SKELETON
+========================================================= */
+
+.pf-skeleton {
+  position: relative;
+  animation: skPulse 1.6s ease infinite;
+}
+
+@keyframes skPulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: .5; }
+}
+
+.pf-skeleton__banner {
+  height: 320px;
+  background: linear-gradient(90deg, rgba(255,255,255,.04) 0%, rgba(255,255,255,.08) 50%, rgba(255,255,255,.04) 100%);
+  background-size: 200% 100%;
+  animation: skShimmer 1.5s infinite;
+}
+
+@keyframes skShimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+.pf-skeleton__avatar {
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  margin: -55px auto 0;
+  border: 3px solid var(--sk-black);
+}
+
+.pf-skeleton__lines {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  margin-top: 1.4rem;
+  padding-bottom: 4rem;
+}
+
+.pf-skeleton__line {
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+}
+.pf-skeleton__line--lg { width: 200px; height: 20px; }
+.pf-skeleton__line--sm { width: 140px; height: 14px; }
+
+
+/* =========================================================
+   03. HERO — BANNER + AVATAR
+========================================================= */
+
+.pf-hero {
+  position: relative;
+  padding-bottom: 4.5rem;
+}
+
+/* banner */
+.pf-banner {
+  position: relative;
+  height: 300px;
+  overflow: hidden;
+  background: var(--sk-dark);
+}
+
+.pf-banner__img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 8s ease;
+}
+.pf-banner:hover .pf-banner__img { transform: scale(1.03); }
+
+.pf-banner__fallback {
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse 60% 80% at 30% 50%, rgba(200,32,26,.18), transparent 55%),
+    radial-gradient(ellipse 50% 60% at 70% 30%, rgba(240,123,16,.12), transparent 55%),
+    linear-gradient(180deg, rgba(20,10,5,1), rgba(10,6,3,1));
+}
+
+.pf-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,.1), rgba(6,4,2,.75));
+}
+
+/* banner edit button */
+.pf-banner__edit {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: rgba(6,4,2,.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.1);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background .2s;
+}
+.pf-banner__edit:hover { background: rgba(240,123,16,.2); }
+
+/* avatar wrap */
+.pf-avatar-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+.pf-avatar {
+  position: relative;
+  width: 110px; height: 110px;
+  border-radius: 50%;
+  border: 3px solid rgba(240,123,16,.9);
+  overflow: hidden;
+  background: var(--sk-dark);
+  box-shadow: 0 20px 50px rgba(0,0,0,.55);
+  transition: opacity .3s;
+}
+.pf-avatar--uploading { opacity: .6; }
+
+.pf-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.pf-avatar__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--sk-orange);
+  letter-spacing: .04em;
+}
+
+.pf-avatar__spinner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pf-avatar__spinner::after {
+  content: '';
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.2);
+  border-top-color: var(--sk-orange);
+  animation: spin .7s linear infinite;
+}
+
+/* avatar edit label */
+.pf-avatar__edit {
+  position: absolute;
+  bottom: 2px; right: 2px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--sk-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: .75rem;
+  border: 2px solid var(--sk-black);
+  transition: background .2s, transform .2s;
+  z-index: 2;
+}
+.pf-avatar__edit:hover { background: var(--sk-red); transform: scale(1.1); }
+
+/* identity text below avatar */
+.pf-identity {
+  text-align: center;
+  margin-top: 4.5rem;
+  padding-inline: 1rem;
+}
+.pf-identity__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  letter-spacing: .04em;
+  color: var(--sk-white);
+  margin-bottom: .3rem;
+}
+.pf-identity__email {
+  font-size: .88rem;
+  color: rgba(255,248,240,.38);
+}
+.pf-dirty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-top: .7rem;
+  padding: .3rem .85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(240,123,16,.3);
+  background: rgba(240,123,16,.08);
+  color: var(--sk-orange);
+  font-size: .68rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   04. TABS
+========================================================= */
+
+.pf-tabs {
+  display: flex;
+  gap: .5rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  padding-bottom: 0;
+  margin-top: 1.8rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.pf-tabs::-webkit-scrollbar { display: none; }
+
+.pf-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .75rem 1.2rem;
+  border: 0;
+  background: transparent;
+  color: rgba(255,248,240,.42);
+  font-size: .82rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color .2s, border-color .2s;
+  margin-bottom: -1px;
+}
+.pf-tab:hover { color: var(--sk-cream); }
+.pf-tab.active {
+  color: var(--sk-orange);
+  border-bottom-color: var(--sk-orange);
+}
+.pf-tab__icon { font-size: 1rem; }
+
+/* tab transition */
+.pf-tab-slide-enter-active { transition: opacity .25s ease, transform .25s ease; }
+.pf-tab-slide-leave-active { transition: opacity .18s ease; }
+.pf-tab-slide-enter-from   { opacity: 0; transform: translateY(8px); }
+.pf-tab-slide-leave-to     { opacity: 0; }
+
+
+/* =========================================================
+   05. CONTENT AREA
+========================================================= */
+
+.pf-content {
+  padding-block: 2rem 6rem;
+}
+
+.pf-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+
+/* =========================================================
+   06. SECTIONS
+========================================================= */
+
+.pf-section {
+  padding: 1.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: linear-gradient(160deg, rgba(22,11,5,.85), rgba(10,6,3,.97));
+}
+.pf-section--narrow { max-width: 540px; }
+
+.pf-section__hd {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: .85rem;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.pf-section__icon { font-size: 1.2rem; }
+.pf-section__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: .07em;
+  color: var(--sk-white);
+}
+
+
+/* =========================================================
+   07. FORM GRID + FIELDS
+========================================================= */
+
+.pf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.f-group--full { grid-column: span 2; }
+
+.pf-fields { display: flex; flex-direction: column; gap: 1rem; }
+
+.f-group { display: flex; flex-direction: column; gap: .4rem; }
+
+.f-label {
+  font-size: .67rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,248,240,.38);
+}
+
+.f-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pf-input {
+  width: 100%;
+  padding: .85rem 1rem;
+  border-radius: 11px;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.04);
+  color: var(--sk-cream);
+  font-size: .9rem;
+  font-family: var(--font-body);
+  transition: border-color .25s, background .25s, box-shadow .2s, transform .18s;
+}
+.pf-input::placeholder { color: rgba(255,248,240,.2); }
+.pf-input:hover { border-color: rgba(255,255,255,.13); transform: translateY(-1px); }
+.pf-input:focus {
+  outline: none;
+  border-color: rgba(240,123,16,.55);
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 0 0 3px rgba(240,123,16,.1);
+  transform: translateY(-2px);
+}
+
+.pf-textarea {
+  resize: vertical;
+  min-height: 88px;
+  line-height: 1.65;
+}
+
+.pf-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,248,240,.28)'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .85rem center;
+  padding-right: 2.2rem;
+  cursor: pointer;
+}
+
+/* Validation states */
+.f-input-wrap.has-error .pf-input { border-color: rgba(200,32,26,.58); background: rgba(200,32,26,.04); }
+.f-input-wrap.is-valid  .pf-input { border-color: rgba(34,197,94,.5); }
+
+.f-check {
+  position: absolute; right: .85rem;
+  color: #22c55e; font-size: .82rem;
+  pointer-events: none;
+  animation: checkPop .22s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes checkPop { from { opacity:0; transform:scale(.5); } to { opacity:1; transform:scale(1); } }
+
+.f-error {
+  margin: .28rem 0 0;
+  font-size: .7rem;
+  letter-spacing: .04em;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: .32rem;
+}
+.f-error::before {
+  content: '!';
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: rgba(200,32,26,.28); border: 1px solid rgba(200,32,26,.45);
+  font-size: .58rem; font-weight: 700; flex-shrink: 0;
+}
+
+.err-enter-active { transition: opacity .18s ease, transform .18s ease; }
+.err-leave-active { transition: opacity .12s ease; }
+.err-enter-from   { opacity:0; transform:translateY(-4px); }
+.err-leave-to     { opacity:0; }
+
+/* hint text */
+.pf-hint {
+  font-size: .7rem;
+  color: rgba(255,248,240,.28);
+  margin-top: .3rem;
+  line-height: 1.5;
+}
+
+/* password toggle */
+.pf-toggle-pass {
+  position: absolute; right: .85rem;
+  background: none; border: 0; cursor: pointer;
+  font-size: .9rem; opacity: .4;
+  transition: opacity .2s; line-height: 1; padding: 0;
+}
+.pf-toggle-pass:hover { opacity: .85; }
+
+
+/* =========================================================
+   08. IMAGE FIELDS
+========================================================= */
+
+.pf-image-fields { display: flex; flex-direction: column; gap: 1.2rem; }
+
+.pf-image-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.pf-image-preview {
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pf-image-preview--avatar { width: 52px; height: 52px; border-radius: 50%; }
+.pf-image-preview--banner  { width: 100px; height: 52px; }
+
+.pf-image-preview img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-image-preview__empty { font-size: 1.3rem; opacity: .3; }
+
+
+/* =========================================================
+   09. PAYMENT METHODS
+========================================================= */
+
+.pf-payments { display: flex; flex-direction: column; gap: .65rem; }
+
+.pf-payment-item {
+  display: grid;
+  grid-template-columns: 36px 140px 1fr 36px;
+  align-items: center;
+  gap: .65rem;
+}
+.pf-payment-item__icon {
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+}
+.pf-payment-item__remove {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: rgba(255,255,255,.03);
+  color: rgba(255,248,240,.3);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem;
+  transition: background .2s, color .2s;
+}
+.pf-payment-item__remove:hover { background: rgba(200,32,26,.22); color: #f87171; }
+
+.pf-add-payment {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  width: 100%;
+  padding: .8rem 1.1rem;
+  border-radius: 11px;
+  border: 1px dashed rgba(240,123,16,.35);
+  background: rgba(240,123,16,.05);
+  color: var(--sk-orange);
+  font-size: .82rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: background .2s, border-color .2s;
+}
+.pf-add-payment:hover { background: rgba(240,123,16,.1); border-color: rgba(240,123,16,.55); }
+
+
+/* =========================================================
+   10. SAVE BUTTON
+========================================================= */
+
+.pf-save-row { display: flex; justify-content: flex-end; }
+
+.pf-save-btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  padding: .9rem 2.2rem;
+  border: 0;
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: .14em;
+  color: #fff;
+  background: linear-gradient(135deg, var(--sk-red), var(--sk-orange));
+  box-shadow: 0 8px 28px rgba(200,32,26,.28);
+  transition: transform .25s, box-shadow .25s, opacity .25s;
+  min-width: 180px;
+}
+.pf-save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px rgba(200,32,26,.38);
+}
+.pf-save-btn:disabled { opacity: .45; cursor: not-allowed; }
+.pf-save-btn.disabled { opacity: .45; }
+
+/* shine on hover */
+.pf-save-btn::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,.2), transparent);
+  transform: translateX(-100%);
+  transition: transform .6s ease;
+}
+.pf-save-btn:hover:not(:disabled)::before { transform: translateX(100%); }
+
+/* unsaved dot indicator */
+.pf-save-btn__dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.8);
+  animation: dotPulse 1.5s ease infinite;
+}
+@keyframes dotPulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+
+
+/* =========================================================
+   11. SPINNERS
+========================================================= */
+
+.pf-spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.25);
+  border-top-color: #fff;
+  animation: spin .7s linear infinite;
+}
+.pf-spinner--lg { width: 36px; height: 36px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* =========================================================
+   12. FLASH MESSAGES
+========================================================= */
+
+.pf-flash {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .9rem 1.2rem;
+  border-radius: 12px;
+  font-size: .88rem;
+  line-height: 1.6;
+}
+.pf-flash--ok {
+  border: 1px solid rgba(34,197,94,.3);
+  background: rgba(34,197,94,.07);
+  color: #86efac;
+}
+.pf-flash--err {
+  border: 1px solid rgba(200,32,26,.35);
+  background: rgba(200,32,26,.07);
+  color: #f87171;
+}
+
+.pf-flash-enter-active { transition: opacity .3s ease, transform .3s ease; }
+.pf-flash-leave-active { transition: opacity .2s ease; }
+.pf-flash-enter-from   { opacity:0; transform:translateY(-6px); }
+.pf-flash-leave-to     { opacity:0; }
+
+
+/* =========================================================
+   13. STATE (loading / empty)
+========================================================= */
+
+.pf-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: rgba(255,248,240,.4);
+}
+.pf-state__icon { font-size: 2.8rem; opacity: .28; }
+
+.pf-cta-link {
+  color: var(--sk-orange);
+  font-size: .88rem;
+  letter-spacing: .1em;
+  transition: color .2s;
+}
+.pf-cta-link:hover { color: var(--sk-gold); }
+
+
+/* =========================================================
+   14. ORDERS LIST
+========================================================= */
+
+.pf-orders {
+  list-style: none;
+  padding: 0; margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.pf-order {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.06);
+  background: rgba(255,255,255,.025);
+  transition: border-color .2s, background .2s;
+}
+.pf-order:hover {
+  border-color: rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04);
+}
+
+.pf-order__left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+.pf-order__id {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: .06em;
+  color: var(--sk-white);
+}
+.pf-order__date {
+  font-size: .68rem;
+  color: rgba(255,248,240,.3);
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.pf-order__center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+.pf-order__items {
+  font-size: .88rem;
+  color: rgba(255,248,240,.65);
+}
+.pf-order__address {
+  font-size: .75rem;
+  color: rgba(255,248,240,.28);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pf-order__right {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: .4rem;
+}
+.pf-order__total {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--sk-gold);
+}
+
+/* order status badges */
+.pf-order__status {
+  font-size: .65rem;
+  letter-spacing: .12em;
+  padding: .25rem .65rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.pf-order__status--pendiente  { background: rgba(245,200,66,.12); color: #fde68a; border: 1px solid rgba(245,200,66,.25); }
+.pf-order__status--preparando { background: rgba(240,123,16,.12); color: #fdba74; border: 1px solid rgba(240,123,16,.25); }
+.pf-order__status--enviado    { background: rgba(59,130,246,.12); color: #93c5fd; border: 1px solid rgba(59,130,246,.25); }
+.pf-order__status--entregado  { background: rgba(34,197,94,.12);  color: #86efac; border: 1px solid rgba(34,197,94,.25);  }
+.pf-order__status--cancelado  { background: rgba(200,32,26,.12);  color: #f87171; border: 1px solid rgba(200,32,26,.25);  }
+
+
+/* =========================================================
+   15. RESPONSIVE
+========================================================= */
+
+@media (max-width: 960px) {
+  .pf-banner { height: 240px; }
+}
+
+@media (max-width: 640px) {
+  .pf-grid { grid-template-columns: 1fr; }
+  .f-group--full { grid-column: span 1; }
+  .pf-section { padding: 1.3rem; }
+  .pf-payment-item { grid-template-columns: 36px 1fr 36px; }
+  .pf-payment-item .pf-select { display: none; }  /* show only on larger */
+  .pf-order { flex-wrap: wrap; gap: .7rem; }
+  .pf-order__right { flex-direction: row; align-items: center; gap: .8rem; }
+  .pf-save-row { justify-content: stretch; }
+  .pf-save-btn { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .pf-banner { height: 190px; }
+  .pf-identity { margin-top: 4rem; }
+  .pf-image-row { flex-direction: column; }
+}
+
+
+/* =========================================================
+   16. ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+:focus-visible { outline: 2px solid var(--sk-orange); outline-offset: 3px; }
+::selection    { background: var(--sk-red); color: var(--sk-white); }

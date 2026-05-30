@@ -5,6 +5,7 @@ import About from '../about/about.vue'
 import Menu from '../menu/menu.vue'
 import Carta from '../carta/carta.vue'
 import Pedido from '../pedido/pedido.vue'
+import Perfil from '../perfil/perfil.vue'
 import Reservations from '../reserv/reservations.vue'
 import Contact from '../contact/contact.vue'
 import Login from '../login/login.vue'
@@ -16,6 +17,7 @@ const routes = [
   { path: '/menu', component: Menu },
   { path: '/carta', component: Carta },
   { path: '/pedido', component: Pedido },
+  { path: '/perfil', component: Perfil },
   { path: '/reservations', component: Reservations },
   { path: '/contact', component: Contact },
   { path: '/login', component: Login },
