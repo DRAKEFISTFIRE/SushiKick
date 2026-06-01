@@ -1,0 +1,709 @@
+/* =========================================================
+   OrderTracker.css
+   Depends on home.css: :root tokens, .container,
+   .section-tag, .btn-primary, .btn-ghost
+========================================================= */
+
+
+/* =========================================================
+   01. PAGE SHELL
+========================================================= */
+
+.ot-page {
+  background: var(--sk-black);
+  color: var(--sk-cream);
+  min-height: 100svh;
+  padding-top: calc(var(--nav-h, 90px) + 2rem);
+  padding-bottom: 5rem;
+}
+
+
+/* =========================================================
+   02. HEADER STRIP
+========================================================= */
+
+.ot-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 2rem;
+}
+
+.ot-header__left {
+  display: flex;
+  flex-direction: column;
+  gap: .4rem;
+}
+
+.ot-header__title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: .04em;
+  line-height: 1;
+  color: var(--sk-white);
+  margin: 0;
+}
+.ot-header__title em {
+  font-style: normal;
+  color: var(--sk-orange);
+}
+
+
+/* =========================================================
+   03. CANCEL BUTTON
+========================================================= */
+
+.ot-cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  padding: .65rem 1.2rem;
+  border-radius: 50px;
+  border: 1.5px solid rgba(200,32,26,.4);
+  background: rgba(200,32,26,.07);
+  color: #f87171;
+  font-family: var(--font-display, inherit);
+  font-size: .8rem;
+  letter-spacing: .12em;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+.ot-cancel-btn:hover {
+  background: rgba(200,32,26,.14);
+  border-color: rgba(200,32,26,.65);
+  transform: translateY(-1px);
+}
+.ot-cancel-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(200,32,26,.2);
+  font-size: .72rem;
+  flex-shrink: 0;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .75rem 1.6rem;
+  border-radius: 50px;
+  border: 0;
+  background: linear-gradient(135deg, #c8201a, #e53935);
+  color: #fff;
+  font-family: var(--font-display, inherit);
+  font-size: .9rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, opacity .2s;
+  min-width: 130px;
+}
+.btn-danger:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(200,32,26,.4);
+}
+.btn-danger:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   04. MAIN LAYOUT  (left panel + map)
+========================================================= */
+
+.ot-layout {
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.ot-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+
+/* =========================================================
+   05. TIME CARDS
+========================================================= */
+
+.ot-time-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .85rem;
+}
+
+.ot-time-card--eta {
+  grid-column: 1 / -1;
+}
+
+.ot-time-card {
+  padding: 1.1rem 1.2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: linear-gradient(150deg, rgba(22,11,4,.9), rgba(10,6,3,.98));
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  transition: border-color .4s;
+}
+.ot-time-card.is-done {
+  border-color: rgba(34,197,94,.25);
+  background: linear-gradient(150deg, rgba(6,20,10,.9), rgba(10,6,3,.98));
+}
+
+.ot-time-card__label {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,248,240,.35);
+}
+
+.ot-time-card__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ot-time-card__dot.prep     { background: var(--sk-orange); box-shadow: 0 0 5px rgba(240,123,16,.6); }
+.ot-time-card__dot.delivery { background: var(--sk-red);    box-shadow: 0 0 5px rgba(200,32,26,.6); }
+.ot-time-card__dot.eta      { background: var(--sk-gold, #d4af37); box-shadow: 0 0 5px rgba(212,175,55,.5); }
+
+.ot-time-card__value {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  letter-spacing: .04em;
+  color: var(--sk-white);
+  line-height: 1;
+}
+.ot-time-card__value--large { font-size: 2.4rem; }
+
+.ot-time-card__countdown          { color: var(--sk-orange); }
+.ot-time-card__countdown.delivery { color: var(--sk-red); }
+.ot-time-card__pending            { color: rgba(255,248,240,.2); font-size: 1.1rem; }
+.ot-time-card__done               { color: #22c55e; font-size: 1.1rem; }
+
+.ot-time-card__bar {
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255,255,255,.06);
+  overflow: hidden;
+  margin-top: .2rem;
+}
+.ot-time-card__bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s linear;
+}
+.ot-time-card__bar-fill.prep     { background: linear-gradient(90deg, var(--sk-red), var(--sk-orange)); }
+.ot-time-card__bar-fill.delivery { background: linear-gradient(90deg, #c8201a, #e53935); }
+
+.ot-time-card__meta {
+  font-size: .68rem;
+  color: rgba(255,248,240,.28);
+  letter-spacing: .06em;
+  margin: 0;
+}
+
+
+/* =========================================================
+   06. STEP TIMELINE
+========================================================= */
+
+.ot-steps {
+  padding: 1.6rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.07);
+  background: linear-gradient(160deg, rgba(22,11,4,.9), rgba(10,6,3,.98));
+  display: flex;
+  flex-direction: column;
+}
+
+.ot-step {
+  display: grid;
+  grid-template-columns: 2px 36px 1fr;
+  column-gap: .9rem;
+  position: relative;
+}
+
+/* connector line */
+.ot-step__line {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  background: rgba(255,255,255,.06);
+  position: relative;
+  margin-left: 17px;
+  width: 2px;
+}
+.ot-step__line-fill {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(to bottom, var(--sk-orange), var(--sk-red));
+  transition: height .8s ease;
+  border-radius: 2px;
+}
+.ot-step__line-fill.filled { height: 100%; }
+
+/* icon node */
+.ot-step__node {
+  grid-column: 2;
+  grid-row: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  padding: .5rem 0;
+}
+
+.ot-step__node-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04);
+  transition: background .4s, border-color .4s, box-shadow .4s;
+}
+.ot-step.is-done .ot-step__node-icon {
+  background: rgba(34,197,94,.12);
+  border-color: rgba(34,197,94,.4);
+  color: #22c55e;
+  font-weight: 700;
+}
+.ot-step.is-active .ot-step__node-icon {
+  background: rgba(240,123,16,.15);
+  border-color: rgba(240,123,16,.55);
+  box-shadow: 0 0 14px rgba(240,123,16,.25);
+}
+.ot-step.is-pending .ot-step__node-icon { opacity: .3; }
+
+/* pulse ring */
+.ot-step__pulse {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(240,123,16,.35);
+  animation: stepPulse 1.8s ease infinite;
+  pointer-events: none;
+}
+@keyframes stepPulse {
+  0%   { transform: scale(.75); opacity: .7; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+/* text body */
+.ot-step__body {
+  grid-column: 3;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: .45rem 0 1rem;
+}
+
+.ot-step__title {
+  font-family: var(--font-display);
+  font-size: .92rem;
+  letter-spacing: .06em;
+  color: var(--sk-cream);
+  transition: color .3s;
+}
+.ot-step.is-done .ot-step__title    { color: #22c55e; }
+.ot-step.is-active .ot-step__title  { color: var(--sk-orange); }
+.ot-step.is-pending .ot-step__title { color: rgba(255,248,240,.3); }
+
+.ot-step__time {
+  font-size: .65rem;
+  letter-spacing: .1em;
+  color: rgba(255,248,240,.3);
+}
+.ot-step.is-done .ot-step__time   { color: rgba(34,197,94,.5); }
+.ot-step.is-active .ot-step__time { color: rgba(240,123,16,.6); }
+
+.ot-step__desc {
+  font-size: .78rem;
+  color: rgba(255,248,240,.45);
+  line-height: 1.55;
+  margin: .2rem 0 0;
+  animation: fadeInUp .35s ease both;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ot-step:last-child .ot-step__line { visibility: hidden; }
+
+
+/* =========================================================
+   07. MAP COLUMN  ← the fix
+========================================================= */
+
+.ot-map-col {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  /* Stick to viewport while left panel scrolls */
+  position: sticky;
+  top: calc(var(--nav-h, 90px) + 1.5rem);
+  /* Never taller than the viewport */
+  max-height: calc(100svh - var(--nav-h, 90px) - 3rem);
+}
+
+.ot-map-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* ── The map div itself ── */
+.ot-map {
+  width: 100%;
+  /* Fill remaining space in the sticky column */
+  flex: 1 1 0;
+  /* Hard minimum so Leaflet always has room to render */
+  min-height: 420px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.07);
+  box-shadow: 0 20px 60px rgba(0,0,0,.5);
+  /* Leaflet needs a non-zero size at mount time */
+  display: block;
+  position: relative;
+}
+
+/* Force Leaflet's internal canvas/svg to fill the container */
+.ot-map .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background: #0e0803;
+  border-radius: 20px;
+}
+
+/* Leaflet dark-theme overrides */
+.ot-map .leaflet-popup-content-wrapper {
+  background: rgba(14,8,3,.96) !important;
+  border: 1px solid rgba(255,255,255,.1) !important;
+  border-radius: 10px !important;
+  color: var(--sk-cream) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5) !important;
+  font-family: var(--font-body, sans-serif) !important;
+  font-size: .82rem !important;
+}
+.ot-map .leaflet-popup-tip { background: rgba(14,8,3,.96) !important; }
+.ot-map .leaflet-popup-close-button { color: rgba(255,248,240,.4) !important; }
+.ot-map .leaflet-control-zoom a {
+  background: rgba(14,8,3,.9) !important;
+  border-color: rgba(255,255,255,.1) !important;
+  color: rgba(255,248,240,.7) !important;
+}
+.ot-map .leaflet-control-zoom a:hover {
+  background: rgba(240,123,16,.2) !important;
+  color: var(--sk-orange) !important;
+}
+
+
+/* =========================================================
+   08. MAP STATUS BADGE
+========================================================= */
+
+.ot-map-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .95rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04);
+  font-size: .72rem;
+  letter-spacing: .12em;
+  color: rgba(255,248,240,.5);
+  transition: all .4s;
+}
+.ot-map-badge.is-active {
+  border-color: rgba(240,123,16,.4);
+  background: rgba(240,123,16,.08);
+  color: var(--sk-orange);
+}
+.ot-map-badge.is-active .ot-map-badge__dot {
+  background: var(--sk-orange);
+  animation: badgePulse 1.4s ease infinite;
+}
+.ot-map-badge.is-done {
+  border-color: rgba(34,197,94,.3);
+  background: rgba(34,197,94,.06);
+  color: #22c55e;
+}
+.ot-map-badge.is-done .ot-map-badge__dot { background: #22c55e; animation: none; }
+.ot-map-badge.is-cancelled {
+  border-color: rgba(200,32,26,.35);
+  color: #f87171;
+}
+
+.ot-map-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,248,240,.3);
+  flex-shrink: 0;
+}
+@keyframes badgePulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: .3; }
+}
+
+
+/* =========================================================
+   09. MAP LEGEND
+========================================================= */
+
+.ot-map-legend {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  color: rgba(255,248,240,.3);
+  flex-shrink: 0;
+}
+.ot-legend-item {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.ot-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ot-legend-dot.restaurant { background: var(--sk-orange); }
+.ot-legend-dot.user       { background: var(--sk-red); }
+.ot-legend-dot.rider      { background: #22c55e; }
+
+
+/* =========================================================
+   10. CUSTOM MAP MARKERS
+========================================================= */
+
+.ot-map-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  border: 2px solid rgba(255,255,255,.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,.5);
+}
+.ot-map-icon--restaurant {
+  background: rgba(240,123,16,.25);
+  border-color: rgba(240,123,16,.55);
+}
+.ot-map-icon--user {
+  background: rgba(200,32,26,.2);
+  border-color: rgba(200,32,26,.5);
+}
+.ot-map-icon--rider {
+  background: rgba(34,197,94,.2);
+  border-color: rgba(34,197,94,.5);
+  animation: riderBounce .8s ease infinite alternate;
+}
+@keyframes riderBounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-4px); }
+}
+
+
+/* =========================================================
+   11. CANCEL MODAL
+========================================================= */
+
+.ot-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(6,4,2,.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.ot-modal {
+  width: 100%;
+  max-width: 420px;
+  padding: 2.5rem 2rem;
+  border-radius: 24px;
+  border: 1px solid rgba(200,32,26,.3);
+  background: linear-gradient(160deg, rgba(28,10,8,.98), rgba(10,6,3,1));
+  box-shadow: 0 32px 70px rgba(0,0,0,.65);
+  text-align: center;
+  animation: modalPop .3s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes modalPop {
+  from { opacity:0; transform: scale(.88) translateY(12px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.ot-modal__icon  { font-size: 3rem; margin-bottom: .8rem; }
+.ot-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: .06em;
+  color: var(--sk-white);
+  margin: 0 0 .7rem;
+}
+.ot-modal__sub {
+  font-size: .88rem;
+  color: rgba(255,248,240,.5);
+  line-height: 1.75;
+  margin: 0 0 2rem;
+}
+.ot-modal__sub strong { color: var(--sk-orange); }
+.ot-modal__actions {
+  display: flex;
+  gap: .8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.modal-fade-enter-active { transition: opacity .22s ease; }
+.modal-fade-leave-active { transition: opacity .18s ease; }
+.modal-fade-enter-from,
+.modal-fade-leave-to     { opacity: 0; }
+
+
+/* =========================================================
+   12. CANCELLED SCREEN
+========================================================= */
+
+.ot-cancelled {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--sk-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.ot-cancelled__card {
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  padding: 3rem 2.5rem;
+  border-radius: 28px;
+  border: 1px solid rgba(200,32,26,.25);
+  background: linear-gradient(160deg, rgba(24,8,6,.97), rgba(10,6,3,1));
+  box-shadow: 0 40px 80px rgba(0,0,0,.6);
+}
+
+.ot-cancelled__icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: iconPop .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+.ot-cancelled__title {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  letter-spacing: .04em;
+  color: #f87171;
+  margin: 0 0 .7rem;
+}
+.ot-cancelled__sub {
+  color: rgba(255,248,240,.5);
+  font-size: .95rem;
+  line-height: 1.75;
+  margin: 0 0 2rem;
+}
+.ot-cancelled__sub strong { color: var(--sk-cream); }
+.ot-cancelled__actions { display: flex; gap: .8rem; justify-content: center; flex-wrap: wrap; }
+
+@keyframes iconPop {
+  from { opacity:0; transform: scale(.5); }
+  to   { opacity:1; transform: scale(1); }
+}
+
+.success-fade-enter-active { transition: opacity .4s ease; }
+.success-fade-enter-from   { opacity: 0; }
+
+
+/* =========================================================
+   13. SPINNER
+========================================================= */
+
+.ot-spinner {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* =========================================================
+   14. RESPONSIVE
+========================================================= */
+
+@media (max-width: 1099px) {
+  .ot-layout {
+    grid-template-columns: 1fr;
+  }
+  .ot-map-col {
+    position: static;
+    max-height: none;
+    order: -1;           /* map first on mobile */
+  }
+  .ot-map {
+    min-height: 300px;
+    height: 340px;
+    flex: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .ot-header { flex-direction: column; align-items: flex-start; }
+  .ot-time-cards { grid-template-columns: 1fr 1fr; }
+  .ot-map { height: 260px; min-height: 260px; }
+}
+
+@media (max-width: 400px) {
+  .ot-time-cards { grid-template-columns: 1fr; }
+}
+
+
+/* =========================================================
+   15. ACCESSIBILITY
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+:focus-visible { outline: 2px solid var(--sk-orange); outline-offset: 3px; }

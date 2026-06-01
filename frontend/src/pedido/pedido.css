@@ -865,3 +865,11 @@
 
 :focus-visible { outline: 2px solid var(--sk-orange); outline-offset: 3px; }
 ::selection    { background: var(--sk-red); color: var(--sk-white); }
+
+.pd-tracker-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--sk-black);
+  overflow-y: auto;
+}

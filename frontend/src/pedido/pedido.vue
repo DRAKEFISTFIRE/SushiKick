@@ -3,33 +3,19 @@
     <Navbar />
 
     <!-- ══════════════════════════════════
-         SUCCESS SCREEN
+         SUCCESS → ORDER TRACKER (inline)
     ══════════════════════════════════ -->
     <Transition name="success-fade">
-      <div v-if="submitted" class="pd-success">
-        <div class="pd-success__card">
-          <div class="pd-success__ring"></div>
-          <div class="pd-success__icon">✅</div>
-          <h1 class="pd-success__title">Comanda confirmada!</h1>
-          <p class="pd-success__sub">
-            La teva comanda <strong>#{{ orderId }}</strong> s'ha rebut.
-            T'avisarem quan estigui en camí.
-          </p>
-          <div class="pd-success__meta">
-            <div class="pd-success__meta-item">
-              <span>🕒</span>
-              <span>Temps estimat: <strong>25–35 min</strong></span>
-            </div>
-            <div class="pd-success__meta-item">
-              <span>📍</span>
-              <span>{{ deliveryType === 'domicili' ? form.address : form.addressLocal }}</span>
-            </div>
-          </div>
-          <div class="pd-success__actions">
-            <router-link to="/" class="btn-primary">Tornar a l'inici</router-link>
-            <router-link to="/carta" class="btn-ghost">Veure la carta</router-link>
-          </div>
-        </div>
+      <div v-if="submitted" class="pd-tracker-wrap">
+        <OrderTracker
+          :order-id="orderId"
+          :prep-minutes="orderMeta?.tiempo_preparacion ?? 12"
+          :delivery-minutes="orderMeta?.deliveryMinutes ?? 20"
+          :restaurant-lat="localInfo.lat ?? 41.3785"
+          :restaurant-lng="localInfo.lng ?? 2.1699"
+          :user-lat="userCoords.lat"
+          :user-lng="userCoords.lng"
+        />
       </div>
     </Transition>
 
@@ -138,7 +124,6 @@
               <Transition name="slide-down">
                 <div v-if="deliveryType === 'domicili'" class="f-group">
                   <label class="f-label" for="pd-address">Adreça d'entrega</label>
-
                   <div class="f-input-wrap" :class="fieldClass('address')">
                     <span class="f-icon" aria-hidden="true">📍</span>
                     <input
@@ -152,7 +137,6 @@
                     />
                     <span v-if="isFieldValid('address')" class="f-check">✓</span>
                   </div>
-
                   <Transition name="err">
                     <p v-if="visibleError('address')" class="f-error">
                       {{ visibleError('address') }}
@@ -164,10 +148,8 @@
               <!-- ⏰ Hora del pedido -->
               <div class="f-group">
                 <label class="f-label" for="pd-time">Hora de la comanda</label>
-
                 <div class="f-input-wrap" :class="fieldClass('orderTime')">
                   <span class="f-icon" aria-hidden="true">⏰</span>
-
                   <input
                     id="pd-time"
                     class="f-input"
@@ -175,10 +157,8 @@
                     v-model="form.orderTime"
                     @blur="touch('orderTime')"
                   />
-
                   <span v-if="form.orderTime" class="f-check">✓</span>
                 </div>
-
                 <Transition name="err">
                   <p v-if="visibleError('orderTime')" class="f-error">
                     {{ visibleError('orderTime') }}
@@ -218,7 +198,6 @@
               Mètode de pagament
             </h2>
 
-            <!-- Payment method selector -->
             <div class="pd-payment-grid">
               <button
                 v-for="pm in PAYMENT_METHODS"
@@ -235,104 +214,50 @@
               </button>
             </div>
 
-            <!-- Payment detail fields -->
             <Transition name="slide-down" mode="out-in">
 
-              <!-- Card fields -->
               <div v-if="form.paymentMethod === 'tarjeta'" key="tarjeta" class="pd-payment-fields">
-                <div class="pd-payment-fields__hd">
-                  <span>💳</span>
-                  <span>Detalls de la targeta</span>
-                </div>
-
+                <div class="pd-payment-fields__hd"><span>💳</span><span>Detalls de la targeta</span></div>
                 <div class="pd-fields">
                   <div class="f-group">
                     <label class="f-label" for="card-name">Titular</label>
                     <div class="f-input-wrap" :class="fieldClass('cardName')">
-                      <input
-                        id="card-name"
-                        class="f-input"
-                        type="text"
-                        placeholder="Nom tal com apareix a la targeta"
-                        v-model="form.cardName"
-                        autocomplete="cc-name"
-                        @blur="touch('cardName')"
-                      />
+                      <input id="card-name" class="f-input" type="text" placeholder="Nom tal com apareix a la targeta"
+                        v-model="form.cardName" autocomplete="cc-name" @blur="touch('cardName')" />
                       <span v-if="isFieldValid('cardName')" class="f-check">✓</span>
                     </div>
-                    <Transition name="err">
-                      <p v-if="visibleError('cardName')" class="f-error">{{ visibleError('cardName') }}</p>
-                    </Transition>
+                    <Transition name="err"><p v-if="visibleError('cardName')" class="f-error">{{ visibleError('cardName') }}</p></Transition>
                   </div>
-
                   <div class="f-group">
                     <label class="f-label" for="card-num">Número de targeta</label>
                     <div class="f-input-wrap pd-card-num" :class="fieldClass('cardNumber')">
-                      <input
-                        id="card-num"
-                        class="f-input"
-                        type="text"
-                        placeholder="0000 0000 0000 0000"
-                        :value="form.cardNumber"
-                        @input="formatCardNumber"
-                        @blur="touch('cardNumber')"
-                        inputmode="numeric"
-                        autocomplete="cc-number"
-                        maxlength="19"
-                      />
+                      <input id="card-num" class="f-input" type="text" placeholder="0000 0000 0000 0000"
+                        :value="form.cardNumber" @input="formatCardNumber" @blur="touch('cardNumber')"
+                        inputmode="numeric" autocomplete="cc-number" maxlength="19" />
                       <span class="pd-card-brand" aria-hidden="true">{{ cardBrand }}</span>
                     </div>
-                    <Transition name="err">
-                      <p v-if="visibleError('cardNumber')" class="f-error">{{ visibleError('cardNumber') }}</p>
-                    </Transition>
+                    <Transition name="err"><p v-if="visibleError('cardNumber')" class="f-error">{{ visibleError('cardNumber') }}</p></Transition>
                   </div>
-
                   <div class="f-row">
                     <div class="f-group">
                       <label class="f-label" for="card-exp">Caducitat</label>
                       <div class="f-input-wrap" :class="fieldClass('cardExpiry')">
-                        <input
-                          id="card-exp"
-                          class="f-input"
-                          type="text"
-                          placeholder="MM/AA"
-                          :value="form.cardExpiry"
-                          @input="formatCardExpiry"
-                          @blur="touch('cardExpiry')"
-                          inputmode="numeric"
-                          autocomplete="cc-exp"
-                          maxlength="5"
-                        />
+                        <input id="card-exp" class="f-input" type="text" placeholder="MM/AA"
+                          :value="form.cardExpiry" @input="formatCardExpiry" @blur="touch('cardExpiry')"
+                          inputmode="numeric" autocomplete="cc-exp" maxlength="5" />
                       </div>
-                      <Transition name="err">
-                        <p v-if="visibleError('cardExpiry')" class="f-error">{{ visibleError('cardExpiry') }}</p>
-                      </Transition>
+                      <Transition name="err"><p v-if="visibleError('cardExpiry')" class="f-error">{{ visibleError('cardExpiry') }}</p></Transition>
                     </div>
-
                     <div class="f-group">
-                      <label class="f-label" for="card-cvv">
-                        CVV
-                        <span class="pd-cvv-hint" title="Els 3 dígits del darrere de la targeta">?</span>
-                      </label>
+                      <label class="f-label" for="card-cvv">CVV <span class="pd-cvv-hint" title="Els 3 dígits del darrere de la targeta">?</span></label>
                       <div class="f-input-wrap" :class="fieldClass('cardCvv')">
-                        <input
-                          id="card-cvv"
-                          class="f-input"
-                          type="password"
-                          placeholder="•••"
-                          v-model="form.cardCvv"
-                          @blur="touch('cardCvv')"
-                          inputmode="numeric"
-                          autocomplete="cc-csc"
-                          maxlength="4"
-                        />
+                        <input id="card-cvv" class="f-input" type="password" placeholder="•••"
+                          v-model="form.cardCvv" @blur="touch('cardCvv')"
+                          inputmode="numeric" autocomplete="cc-csc" maxlength="4" />
                       </div>
-                      <Transition name="err">
-                        <p v-if="visibleError('cardCvv')" class="f-error">{{ visibleError('cardCvv') }}</p>
-                      </Transition>
+                      <Transition name="err"><p v-if="visibleError('cardCvv')" class="f-error">{{ visibleError('cardCvv') }}</p></Transition>
                     </div>
                   </div>
-
                   <label class="pd-save-card">
                     <input type="checkbox" v-model="form.saveCard" />
                     <span class="pd-save-card__box" aria-hidden="true"></span>
@@ -341,30 +266,18 @@
                 </div>
               </div>
 
-              <!-- Bizum fields -->
               <div v-else-if="form.paymentMethod === 'bizum'" key="bizum" class="pd-payment-fields">
-                <div class="pd-payment-fields__hd">
-                  <span>📱</span>
-                  <span>Pagament per Bizum</span>
-                </div>
+                <div class="pd-payment-fields__hd"><span>📱</span><span>Pagament per Bizum</span></div>
                 <div class="pd-fields">
                   <div class="f-group">
                     <label class="f-label" for="bizum-phone">Telèfon Bizum</label>
                     <div class="f-input-wrap" :class="fieldClass('bizumPhone')">
                       <span class="f-icon">📱</span>
-                      <input
-                        id="bizum-phone"
-                        class="f-input"
-                        type="tel"
-                        placeholder="+34 600 000 000"
-                        v-model="form.bizumPhone"
-                        @blur="touch('bizumPhone')"
-                      />
+                      <input id="bizum-phone" class="f-input" type="tel" placeholder="+34 600 000 000"
+                        v-model="form.bizumPhone" @blur="touch('bizumPhone')" />
                       <span v-if="isFieldValid('bizumPhone')" class="f-check">✓</span>
                     </div>
-                    <Transition name="err">
-                      <p v-if="visibleError('bizumPhone')" class="f-error">{{ visibleError('bizumPhone') }}</p>
-                    </Transition>
+                    <Transition name="err"><p v-if="visibleError('bizumPhone')" class="f-error">{{ visibleError('bizumPhone') }}</p></Transition>
                   </div>
                   <div class="pd-info-banner">
                     <span>ℹ️</span>
@@ -373,31 +286,18 @@
                 </div>
               </div>
 
-              <!-- PayPal fields -->
               <div v-else-if="form.paymentMethod === 'paypal'" key="paypal" class="pd-payment-fields">
-                <div class="pd-payment-fields__hd">
-                  <span>🅿</span>
-                  <span>Pagament amb PayPal</span>
-                </div>
+                <div class="pd-payment-fields__hd"><span>🅿</span><span>Pagament amb PayPal</span></div>
                 <div class="pd-fields">
                   <div class="f-group">
                     <label class="f-label" for="paypal-email">Email PayPal</label>
                     <div class="f-input-wrap" :class="fieldClass('paypalEmail')">
                       <span class="f-icon">✉</span>
-                      <input
-                        id="paypal-email"
-                        class="f-input"
-                        type="email"
-                        placeholder="tu@exemple.com"
-                        v-model="form.paypalEmail"
-                        @blur="touch('paypalEmail')"
-                        autocomplete="email"
-                      />
+                      <input id="paypal-email" class="f-input" type="email" placeholder="tu@exemple.com"
+                        v-model="form.paypalEmail" @blur="touch('paypalEmail')" autocomplete="email" />
                       <span v-if="isFieldValid('paypalEmail')" class="f-check">✓</span>
                     </div>
-                    <Transition name="err">
-                      <p v-if="visibleError('paypalEmail')" class="f-error">{{ visibleError('paypalEmail') }}</p>
-                    </Transition>
+                    <Transition name="err"><p v-if="visibleError('paypalEmail')" class="f-error">{{ visibleError('paypalEmail') }}</p></Transition>
                   </div>
                   <div class="pd-info-banner">
                     <span>ℹ️</span>
@@ -406,7 +306,6 @@
                 </div>
               </div>
 
-              <!-- Cash (no extra fields) -->
               <div v-else key="efectivo" class="pd-payment-fields pd-payment-fields--cash">
                 <span class="pd-cash-icon">💵</span>
                 <p>Pagues quan arribi el repartidor. Prepara l'import exacte si pots.</p>
@@ -433,52 +332,32 @@
 
             <h2 class="pd-summary__title">Resum</h2>
 
-            <!-- Items list -->
             <ul class="pd-items">
               <li v-for="item in cartItems" :key="item.product.id" class="pd-item">
                 <div class="pd-item__img">
-                  <img
-                    v-if="item.product.img"
-                    :src="item.product.img"
-                    :alt="item.product.name"
-                    loading="lazy"
-                  />
+                  <img v-if="item.product.img" :src="item.product.img" :alt="item.product.name" loading="lazy" />
                   <span v-else class="pd-item__img-placeholder">🍣</span>
                 </div>
                 <div class="pd-item__info">
                   <span class="pd-item__name">{{ item.product.name }}</span>
                   <span class="pd-item__qty">× {{ item.qty }}</span>
                 </div>
-                <span class="pd-item__price">
-                  €{{ (item.product.price * item.qty).toFixed(2) }}
-                </span>
+                <span class="pd-item__price">€{{ (item.product.price * item.qty).toFixed(2) }}</span>
               </li>
             </ul>
 
-            <!-- Totals -->
             <div class="pd-totals">
-              <div class="pd-totals__row">
-                <span>Subtotal</span>
-                <span>€{{ cartTotal.toFixed(2) }}</span>
-              </div>
-              <div class="pd-totals__row">
-                <span>Entrega</span>
-                <span class="pd-totals__free">Gratis</span>
-              </div>
+              <div class="pd-totals__row"><span>Subtotal</span><span>€{{ cartTotal.toFixed(2) }}</span></div>
+              <div class="pd-totals__row"><span>Entrega</span><span class="pd-totals__free">Gratis</span></div>
               <div class="pd-totals__divider"></div>
-              <div class="pd-totals__row pd-totals__row--total">
-                <span>Total</span>
-                <span>€{{ cartTotal.toFixed(2) }}</span>
-              </div>
+              <div class="pd-totals__row pd-totals__row--total"><span>Total</span><span>€{{ cartTotal.toFixed(2) }}</span></div>
             </div>
 
-            <!-- Delivery info pill -->
             <div class="pd-delivery-pill">
               <span>{{ deliveryType === 'domicili' ? '🛵 A domicili' : '🏪 Recollida al local' }}</span>
               <span class="pd-delivery-pill__time">~30 min</span>
             </div>
 
-            <!-- CTA button -->
             <button
               class="pd-submit-btn"
               :class="{ loading: submitting }"
@@ -494,7 +373,6 @@
               <span v-if="submitting" class="sr-only">Processant...</span>
             </button>
 
-            <!-- Security badge -->
             <div class="pd-security">
               <span>🔒</span>
               <span>Pagament 100% segur i xifrat</span>
@@ -510,8 +388,9 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import Navbar from '../components/navbar/Navbar.vue'
+import OrderTracker from './OrderTracker.vue'
 import './pedido.css'
 import { PAYMENT_METHODS, DELIVERY_TYPES, useOrder } from './pedido.js'
 
@@ -529,11 +408,41 @@ const {
   submitting,
   submitted,
   orderId,
+  orderMeta,
   submitError,
   submitOrder,
+  localInfo,
 } = useOrder()
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
+// ── Resolve user GPS coords from address ──────────────────────────────────
+// Geocodes the delivery address once the order is confirmed.
+// Falls back to a sensible default (El Raval area) if the API fails.
+
+const RESTAURANT_COORDS = { lat: 41.3785, lng: 2.1699 }  // Carrer del Drac Roig 27
+
+const userCoords = ref({ lat: 41.3851, lng: 2.1734 })  // default fallback
+
+async function geocodeAddress(address) {
+  try {
+    const q   = encodeURIComponent(address + ', Barcelona')
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}&limit=1`)
+    const arr = await res.json()
+    if (arr.length) {
+      userCoords.value = { lat: parseFloat(arr[0].lat), lng: parseFloat(arr[0].lon) }
+    }
+  } catch {
+    // keep fallback coords
+  }
+}
+
+// Once submitted, geocode the delivery address (or keep restaurant for pickup)
+watch(submitted, (val) => {
+  if (!val) return
+  const addr = deliveryType.value === 'domicili' ? form.value.address : form.value.addressLocal
+  geocodeAddress(addr)
+})
+
+// ── Helpers ───────────────────────────────────────────────────────────────
 
 function isFieldValid(field) {
   return (submitAttempted.value || form.value[field]) && !errors.value[field]
@@ -547,13 +456,12 @@ function fieldClass(field) {
   }
 }
 
-// Detect card brand from first digits
 const cardBrand = computed(() => {
   const num = form.value.cardNumber.replace(/\s/g, '')
   if (!num) return ''
-  if (num.startsWith('4'))         return '💳 Visa'
-  if (/^5[1-5]/.test(num))         return '💳 MC'
-  if (num.startsWith('34') || num.startsWith('37')) return '💳 Amex'
+  if (num.startsWith('4'))                              return '💳 Visa'
+  if (/^5[1-5]/.test(num))                             return '💳 MC'
+  if (num.startsWith('34') || num.startsWith('37'))    return '💳 Amex'
   return '💳'
 })
 </script>
