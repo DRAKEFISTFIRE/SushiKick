@@ -285,114 +285,114 @@
         </section>
 
           <!-- ── Payment methods ── -->
-<section class="pf-section">
-  <div class="pf-section__hd">
-    <span class="pf-section__icon">💳</span>
-    <h2 class="pf-section__title">Mètodes de pagament</h2>
-  </div>
-
-  <!-- LISTA DE MÉTODOS -->
-  <div class="pf-payments">
-
-    <div
-      v-for="(pm, i) in form.metodos_pago"
-      :key="i"
-      class="pf-payment-item"
-    >
-
-      <!-- ICONO -->
-      <div class="pf-payment-item__icon">
-        {{
-          PAYMENT_TYPES.find(t => t.id === pm.tipo)?.icon ?? '💳'
-        }}
-      </div>
-
-      <!-- TIPO -->
-      <select
-        class="pf-input pf-select"
-        v-model="pm.tipo"
-      >
-        <option
-          v-for="t in PAYMENT_TYPES"
-          :key="t.id"
-          :value="t.id"
-        >
-          {{ t.label }}
-        </option>
-      </select>
-
-      <!-- DETALLES SEGÚN TIPO -->
-      <div class="pf-payment-item__details">
-
-        <!-- TARJETA -->
-        <template v-if="pm.tipo === 'tarjeta'">
-          <input
-            class="pf-input"
-            v-model="pm.detalles.titular"
-            placeholder="Titular"
-          />
-
-          <input
-            class="pf-input"
-            v-model="pm.detalles.numero"
-            placeholder="0000 0000 0000 0000"
-          />
-
-          <div class="pf-grid">
-            <input
-              class="pf-input"
-              v-model="pm.detalles.exp"
-              placeholder="MM/YY"
-            />
-
-            <input
-              class="pf-input"
-              v-model="pm.detalles.cvv"
-              placeholder="CVV"
-              type="password"
-            />
+        <section class="pf-section">
+          <div class="pf-section__hd">
+            <span class="pf-section__icon">💳</span>
+            <h2 class="pf-section__title">Mètodes de pagament</h2>
           </div>
-        </template>
 
-        <!-- BIZUM -->
-        <template v-else-if="pm.tipo === 'bizum'">
-          <input
-            class="pf-input"
-            v-model="pm.detalles.telefono"
-            placeholder="+34 600 000 000"
-          />
-        </template>
+          <!-- LISTA DE MÉTODOS -->
+          <div class="pf-payments">
 
-        <!-- PAYPAL -->
-        <template v-else-if="pm.tipo === 'paypal'">
-          <input
-            class="pf-input"
-            v-model="pm.detalles.email"
-            placeholder="paypal@email.com"
-            type="email"
-          />
-        </template>
+            <div
+              v-for="(pm, i) in form.metodos_pago"
+              :key="i"
+              class="pf-payment-item"
+            >
 
-      </div>
+              <!-- ICONO -->
+              <div class="pf-payment-item__icon">
+                {{
+                  PAYMENT_TYPES.find(t => t.id === pm.tipo)?.icon ?? '💳'
+                }}
+              </div>
 
-      <!-- REMOVE -->
-      <button
-        class="pf-payment-item__remove"
-        @click="removePayment(i)"
-        aria-label="Eliminar método de pago"
-      >
-        ✕
-      </button>
+              <!-- TIPO -->
+              <select
+                class="pf-input pf-select"
+                v-model="pm.tipo"
+              >
+                <option
+                  v-for="t in PAYMENT_TYPES"
+                  :key="t.id"
+                  :value="t.id"
+                >
+                  {{ t.label }}
+                </option>
+              </select>
 
-    </div>
+              <!-- DETALLES SEGÚN TIPO -->
+              <div class="pf-payment-item__details">
 
-    <!-- ADD -->
-    <button class="pf-add-payment" @click="addPayment">
-      <span>+</span> Afegir mètode de pagament
-    </button>
+                <!-- TARJETA -->
+                <template v-if="pm.tipo === 'tarjeta'">
+                  <input
+                    class="pf-input"
+                    v-model="pm.detalles.titular"
+                    placeholder="Titular"
+                  />
 
-  </div>
-</section>
+                  <input
+                    class="pf-input"
+                    v-model="pm.detalles.numero"
+                    placeholder="0000 0000 0000 0000"
+                  />
+
+                  <div class="pf-grid">
+                    <input
+                      class="pf-input"
+                      v-model="pm.detalles.exp"
+                      placeholder="MM/YY"
+                    />
+
+                    <input
+                      class="pf-input"
+                      v-model="pm.detalles.cvv"
+                      placeholder="CVV"
+                      type="password"
+                    />
+                  </div>
+                </template>
+
+                <!-- BIZUM -->
+                <template v-else-if="pm.tipo === 'bizum'">
+                  <input
+                    class="pf-input"
+                    v-model="pm.detalles.telefono"
+                    placeholder="+34 600 000 000"
+                  />
+                </template>
+
+                <!-- PAYPAL -->
+                <template v-else-if="pm.tipo === 'paypal'">
+                  <input
+                    class="pf-input"
+                    v-model="pm.detalles.email"
+                    placeholder="paypal@email.com"
+                    type="email"
+                  />
+                </template>
+
+              </div>
+
+              <!-- REMOVE -->
+              <button
+                class="pf-payment-item__remove"
+                @click="removePayment(i)"
+                aria-label="Eliminar método de pago"
+              >
+                ✕
+              </button>
+
+            </div>
+
+            <!-- ADD -->
+            <button class="pf-add-payment" @click="addPayment">
+              <span>+</span> Afegir mètode de pagament
+            </button>
+
+          </div>
+        </section>
 
             <!-- ── Save button ── -->
             <div class="pf-save-row">

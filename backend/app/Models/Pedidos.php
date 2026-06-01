@@ -26,6 +26,5 @@ class Pedidos extends Model
         'unidades' => 'array',
         'datos_pago' => 'array',
         'hora_pedido' => 'datetime',
-        'tiempo_preparacion' => 'datetime',
     ];
 }

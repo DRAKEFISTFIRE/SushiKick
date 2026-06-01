@@ -5,43 +5,42 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\PedidoController;
 
-// ─────────────────────────────────────
-// AUTH / USER
-// ─────────────────────────────────────
+// ─────────────────────────────
+// AUTH
+// ─────────────────────────────
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
-Route::post('/logout', [UserController::class, 'logout']);
-Route::get('/user', [UserController::class, 'user']);
 
-// ─────────────────────────────────────
-// PRODUCTOS
-// ─────────────────────────────────────
-
-Route::apiResource('/productos', ProductoController::class);
-
-// ─────────────────────────────────────
-// CATEGORÍAS
-// ─────────────────────────────────────
-
-Route::get('/categorias', [CategoriaController::class, 'index']);
-
-// ─────────────────────────────────────
-// PERFIL (PROTEGIDO)
-// ─────────────────────────────────────
+// ─────────────────────────────
+// PROTEGIDAS (SANCTUM)
+// ─────────────────────────────
 
 Route::middleware('auth:sanctum')->group(function () {
 
+    Route::post('/logout', [UserController::class, 'logout']);
+
+    // CHECKOUT
+    Route::get('/checkout', [PedidoController::class, 'checkout']);
+
+    // PEDIDOS
+    Route::post('/pedidos', [PedidoController::class, 'store']);
+    Route::get('/pedidos', [PedidoController::class, 'index']);
+    Route::get('/pedidos/{id}', [PedidoController::class, 'show']);
+
+    // PERFIL
     Route::get('/perfil/{id}', [PerfilController::class, 'getById']);
     Route::put('/perfil/{id}', [PerfilController::class, 'update']);
-
-    // ✅ AVATAR
     Route::post('/perfil/avatar', [PerfilController::class, 'uploadAvatar']);
-
-    // ✅ BANNER
     Route::post('/perfil/banner', [PerfilController::class, 'uploadBanner']);
-
-    // PASSWORD (MEJOR SIN {id})
     Route::put('/perfil/password', [PerfilController::class, 'changePassword']);
 });
+
+// ─────────────────────────────
+// PÚBLICO
+// ─────────────────────────────
+
+Route::apiResource('/productos', ProductoController::class);
+Route::get('/categorias', [CategoriaController::class, 'index']);
