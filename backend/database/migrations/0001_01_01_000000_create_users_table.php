@@ -32,8 +32,15 @@ return new class extends Migration
             $table->enum('rol', [
                 'usuario',
                 'admin',
-                'repartidor'
+                'repartidor',
+                'trabajador'
             ])->default('usuario');
+
+            $table->decimal('sueldo', 10, 2)->nullable();
+
+            $table->date('fecha_contratacion')->nullable();
+
+            $table->string('cargo')->nullable();
 
             $table->boolean('activo')->default(true);
 
