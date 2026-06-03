@@ -24,6 +24,10 @@ class User extends Authenticatable
         'rol',
         'activo',
         'metodos_pago',
+        'sueldo',
+        'cargo',
+        'fecha_contratacion',
+        'horas_semanales',
     ];
 
     protected $hidden = [
@@ -37,5 +41,6 @@ class User extends Authenticatable
         'activo' => 'boolean',
         'metodos_pago' => 'array',
         'fecha_nacimiento' => 'date',
+        'fecha_contratacion' => 'date',
     ];
 }
