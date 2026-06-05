@@ -151,7 +151,7 @@ class PedidoController extends Controller
                 'total' => round($total, 2),
                 'estado' => 'pendiente',
 
-                'tiempo_preparacion' => $tiempoPreparacion,
+                'tiempo_preparacion' => $horaPedido->copy()->addMinutes($tiempoPreparacion),
 
                 'hora_pedido' => $horaPedido,
             ]);
