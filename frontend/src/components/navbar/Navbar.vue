@@ -27,6 +27,8 @@
             {{ link.label }}
           </a>
         </li>
+
+        <li v-if="userId"><a href="#" data-jp="ログアウト"@click.prevent="tancarSessio">Log Out</a></li>
       </ul>
 
       <!-- CTA -->
@@ -76,7 +78,6 @@ const allLinks = [
   { href: '/carta', label: 'Carta', jp: 'お品書き', auth: true },
   { href: '/reservations', label: 'Reservations', jp: '予約', auth: true },
   { href: '/perfil', label: 'Perfil', jp: 'プロフィール', auth: true },
-  { href: '/logout', label: 'Log Out', jp: 'ログアウト', auth: true },
 
   { href: '/dashboard', label: 'Dashboard', jp: '管理', role: 'admin' }
 ]
@@ -114,6 +115,19 @@ function setActive(href) {
 
 function handleScroll() {
   isScrolled.value = window.scrollY > 40
+}
+
+function tancarSessio() {
+  localStorage.removeItem('token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('user_id')
+  localStorage.removeItem('role')
+  localStorage.removeItem('isAuthenticated')
+
+  userId.value = null
+  userRole.value = null
+
+  window.location.href = '/'
 }
 
 onMounted(() => {
