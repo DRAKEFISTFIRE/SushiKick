@@ -14,18 +14,19 @@ import Dashboard from '../admin/dashboard.vue'
 
 // archivos con proteccion
 import AuthRoute from './AuthRoute.js'
+import ProtectedRoute from './AuthProtected.js'
 
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
   { path: '/menu', component: Menu },
   { path: '/carta', component: Carta },
-  { path: '/pedido', component: Pedido },
-  { path: '/perfil', component: Perfil },
-  { path: '/reservations', component: Reservations },
+  { path: '/pedido', beforeEnter: ProtectedRoute, component: Pedido },
+  { path: '/perfil', beforeEnter: ProtectedRoute, component: Perfil },
+  { path: '/reservations', beforeEnter: ProtectedRoute, component: Reservations },
   { path: '/contact', component: Contact },
   { path: '/login', beforeEnter: AuthRoute, component: Login },
-  { path: '/dashboard', component: Dashboard },
+  { path: '/dashboard', beforeEnter: ProtectedRoute, component: Dashboard },
 ]
 
 export default createRouter({
