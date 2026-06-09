@@ -15,7 +15,7 @@ import Dashboard from '../admin/dashboard.vue'
 // archivos con proteccion
 import AuthRoute from './AuthRoute.js'
 import ProtectedRoute from './AuthProtected.js'
-
+import AdminProtected from './AdminProtected.js'
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -26,7 +26,7 @@ const routes = [
   { path: '/reservations', beforeEnter: ProtectedRoute, component: Reservations },
   { path: '/contact', component: Contact },
   { path: '/login', beforeEnter: AuthRoute, component: Login },
-  { path: '/dashboard', beforeEnter: ProtectedRoute, component: Dashboard },
+  { path: '/dashboard', beforeEnter: AdminProtected, component: Dashboard },
 ]
 
 export default createRouter({
