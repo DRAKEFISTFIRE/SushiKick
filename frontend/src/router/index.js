@@ -11,6 +11,10 @@ import Contact from '../contact/contact.vue'
 import Login from '../login/login.vue'
 import Dashboard from '../admin/dashboard.vue'
 
+
+// archivos con proteccion
+import AuthRoute from './AuthRoute.js'
+
 const routes = [
   { path: '/', component: Home },
   { path: '/about', component: About },
@@ -20,7 +24,7 @@ const routes = [
   { path: '/perfil', component: Perfil },
   { path: '/reservations', component: Reservations },
   { path: '/contact', component: Contact },
-  { path: '/login', component: Login },
+  { path: '/login', beforeEnter: AuthRoute, component: Login },
   { path: '/dashboard', component: Dashboard },
 ]
 
