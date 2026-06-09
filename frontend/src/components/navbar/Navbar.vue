@@ -31,13 +31,6 @@
         <li v-if="userId"><a href="#" data-jp="ログアウト"@click.prevent="tancarSessio">Log Out</a></li>
       </ul>
 
-      <!-- CTA -->
-      <div class="navbar__cta">
-        <a href="/order" class="btn-order">
-          🥢 ORDER NOW
-        </a>
-      </div>
-
       <!-- HAMBURGER -->
       <button
         class="navbar__hamburger"
