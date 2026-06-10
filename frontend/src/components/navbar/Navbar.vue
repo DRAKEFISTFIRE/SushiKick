@@ -72,25 +72,21 @@ const allLinks = [
   { href: '/reservations', label: 'Reservations', jp: '予約', auth: true },
   { href: '/perfil', label: 'Perfil', jp: 'プロフィール', auth: true },
 
-  { href: '/dashboard', label: 'Dashboard', jp: '管理', role: 'admin' }
+  { href: '/dashboard', label: 'Dashboard', jp: '管理', roles: ['admin', 'repartidor', 'trabajador'] }
 ]
 
 const links = computed(() => {
   const loggedIn = !!userId.value
 
   return allLinks.filter(link => {
-    // Siempre visibles
     if (link.public) return true
 
-    // Login solo si NO está autenticado
     if (link.guest) return !loggedIn
 
-    // Enlaces de usuario autenticado
     if (link.auth) return loggedIn
 
-    // Dashboard solo para admin
-    if (link.role) {
-      return loggedIn && userRole.value === link.role
+    if (link.roles) {
+      return loggedIn && link.roles.includes(userRole.value)
     }
 
     return false

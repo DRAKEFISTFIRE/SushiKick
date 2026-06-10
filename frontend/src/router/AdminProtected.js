@@ -4,12 +4,15 @@ export default function AdminProtected(to, from, next) {
   const role = localStorage.getItem('role')
 
   if (!token || !userId) {
-    alert('You need to Login')
     next('/login')
     return
   }
 
-if (role !== 'admin' || 'repartidor' || 'trabajador' ) {
+  if (
+    role !== 'admin' &&
+    role !== 'repartidor' &&
+    role !== 'trabajador'
+  ) {
     alert('You do not have permission to access this page')
     next('/')
     return
