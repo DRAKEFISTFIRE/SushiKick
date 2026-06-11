@@ -7,13 +7,21 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\AdminController;
-
+use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\AuthSocialController;
 // ─────────────────────────────
 // AUTH
 // ─────────────────────────────
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
+// REMEMBER PASS
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink']);
+Route::post('/validate-reset-token', [PasswordResetController::class, 'validateToken']);
+Route::post('/reset-password', [PasswordResetController::class, 'reset']);
 
+// Login social
+Route::get('/auth/{provider}/redirect', [AuthSocialController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [AuthSocialController::class, 'callback']);
 // ─────────────────────────────
 // PROTEGIDAS (SANCTUM)
 // ─────────────────────────────
