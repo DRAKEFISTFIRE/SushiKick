@@ -677,6 +677,71 @@
 
   background: rgba(255, 255, 255, 0.02);
 }
+/* ─── Selects mejorados ───────────────────────────────── */
+
+.modal__select,
+.dash-btn--select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* flecha custom */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23F07B10' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  background-size: 11px;
+
+  cursor: pointer;
+}
+
+.modal__select {
+  padding-right: 2.6rem;
+}
+
+.dash-btn--select {
+  padding-right: 2.2rem;
+}
+
+/* Estado hover/focus */
+.modal__select:hover,
+.dash-btn--select:hover {
+  border-color: rgba(240, 123, 16, 0.35);
+}
+
+.modal__select:focus,
+.dash-btn--select:focus {
+  border-color: rgba(240, 123, 16, 0.55);
+  box-shadow: 0 0 0 3px rgba(240, 123, 16, 0.12);
+}
+
+/* Opciones del desplegable (soporte limitado por navegador) */
+.modal__select option,
+.dash-btn--select option {
+  background: #1a0e07;
+  color: var(--sk-cream);
+  padding: 0.6rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+}
+
+.modal__select option:checked,
+.dash-btn--select option:checked {
+  background: rgba(240, 123, 16, 0.18);
+  color: var(--sk-orange);
+}
+
+.modal__select option:hover,
+.dash-btn--select option:hover {
+  background: rgba(240, 123, 16, 0.12);
+}
+
+/* Firefox: color de selección de opciones */
+@-moz-document url-prefix() {
+  .modal__select,
+  .dash-btn--select {
+    background-image: none;
+  }
+}
 
 .delivery-card__id {
   font-family: var(--font-display);

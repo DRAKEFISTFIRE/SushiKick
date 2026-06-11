@@ -151,7 +151,7 @@
                     </select>
                   </template>
 
-                  <!-- REPARTIDOR: solo puede marcar enviado → entregado -->
+                  <!-- REPARTIDOR: preparando → enviado → entregado -->
                   <template v-else-if="isRepartidor">
                     <button
                       v-if="pedido.estado === 'preparando'"
@@ -207,35 +207,27 @@
               </td>
             </tr>
             <tr
-              v-for="u in usuarios"
-              :key="u.id"
-              class="dash-table__row"
-            >
-              <td class="dash-table__id">#{{ u.id }}</td>
-              <td>{{ u.name }}</td>
-              <td class="dash-table__muted">{{ u.email }}</td>
-              <td>
-                <span class="role-badge" :class="`role-badge--${u.role}`">
-                  {{ u.role }}
-                </span>
-              </td>
-              <td class="dash-table__muted">{{ u.pedidos_count ?? 0 }}</td>
-              <td class="dash-table__time">{{ formatDate(u.created_at) }}</td>
-              <td>
-                <div class="dash-table__actions">
-                  <button
-                    class="dash-btn dash-btn--icon"
-                    title="Editar usuario"
-                    @click="openEditUser(u)"
-                  >✏️</button>
-                  <button
-                    class="dash-btn dash-btn--icon dash-btn--danger"
-                    title="Eliminar usuario"
-                    @click="confirmDeleteUser(u)"
-                  >🗑️</button>
-                </div>
-              </td>
-            </tr>
+            v-for="u in usuarios"
+            :key="u.id"
+            class="dash-table__row"
+          >
+            <td class="dash-table__id">#{{ u.id }}</td>
+            <td>{{ u.nombre }}</td>
+            <td class="dash-table__muted">{{ u.email }}</td>
+            <td>
+              <span class="role-badge" :class="`role-badge--${u.rol}`">
+                {{ u.rol }}
+              </span>
+            </td>
+            <td class="dash-table__muted">{{ u.pedidos_count ?? 0 }}</td>
+            <td class="dash-table__time">{{ formatDate(u.created_at) }}</td>
+            <td>
+              <div class="dash-table__actions">
+                <button class="dash-btn dash-btn--icon" title="Editar usuario" @click="openEditUser(u)">✏️</button>
+                <button class="dash-btn dash-btn--icon dash-btn--danger" title="Eliminar usuario" @click="confirmDeleteUser(u)">🗑️</button>
+              </div>
+            </td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -260,18 +252,12 @@
           </div>
 
           <div class="delivery-card__body">
-            <p class="delivery-card__addr">
-              📍 {{ pedido.direccion }}
-            </p>
-            <p class="delivery-card__client">
-              👤 {{ pedido.user?.name ?? '—' }}
-            </p>
+            <p class="delivery-card__addr">📍 {{ pedido.direccion }}</p>
+            <p class="delivery-card__client">👤 {{ pedido.user?.name ?? '—' }}</p>
             <p class="delivery-card__total">
               💶 {{ pedido.total }}€ · {{ pagoIcon(pedido.tipo_pago) }} {{ pedido.tipo_pago }}
             </p>
-            <p v-if="pedido.notas" class="delivery-card__notas">
-              📝 {{ pedido.notas }}
-            </p>
+            <p v-if="pedido.notas" class="delivery-card__notas">📝 {{ pedido.notas }}</p>
           </div>
 
           <div class="delivery-card__footer">
@@ -289,9 +275,7 @@
             >
               ✅ Marcar como entregado
             </button>
-            <span v-else class="delivery-card__done">
-              ✓ Sin acción pendiente
-            </span>
+            <span v-else class="delivery-card__done">✓ Sin acción pendiente</span>
           </div>
         </div>
 
@@ -314,7 +298,6 @@
           </div>
 
           <div class="modal__body" v-if="editingPedido">
-
             <div class="modal__field">
               <label class="modal__label">Estado</label>
               <select v-model="editForm.estado" class="modal__select">
@@ -353,7 +336,6 @@
               <label class="modal__label">Total (€)</label>
               <input v-model="editForm.total" class="modal__input" type="number" step="0.01" min="0" />
             </div>
-
           </div>
 
           <div class="modal__footer">
@@ -370,18 +352,20 @@
     <!-- ===== MODAL: EDITAR USUARIO ===== -->
     <Teleport to="body">
       <div v-if="modal.editUser" class="modal-overlay" @click.self="closeModal">
-        <div class="modal">
+        <div class="modal modal--lg">
           <div class="modal__header">
             <h3 class="modal__title">
               {{ editingUser?.id ? 'Editar usuario' : 'Nuevo usuario' }}
+              <span v-if="editingUser?.id" class="modal__id">#{{ editingUser.id }}</span>
             </h3>
             <button class="modal__close" @click="closeModal">✕</button>
           </div>
 
           <div class="modal__body">
+
             <div class="modal__field">
               <label class="modal__label">Nombre</label>
-              <input v-model="userForm.name" class="modal__input" type="text" />
+              <input v-model="userForm.nombre" class="modal__input" type="text" />
             </div>
 
             <div class="modal__field">
@@ -390,9 +374,16 @@
             </div>
 
             <div class="modal__field">
+              <label class="modal__label">
+                {{ editingUser?.id ? 'Nueva contraseña (dejar vacío = no cambiar)' : 'Contraseña' }}
+              </label>
+              <input v-model="userForm.password" class="modal__input" type="password" autocomplete="new-password" />
+            </div>
+
+            <div class="modal__field">
               <label class="modal__label">Rol</label>
-              <select v-model="userForm.role" class="modal__select">
-                <option value="cliente">👤 Cliente</option>
+              <select v-model="userForm.rol" class="modal__select">
+                <option value="usuario">👤 Usuario</option>
                 <option value="trabajador">👨‍🍳 Trabajador</option>
                 <option value="repartidor">🛵 Repartidor</option>
                 <option value="admin">🔑 Admin</option>
@@ -400,11 +391,57 @@
             </div>
 
             <div class="modal__field">
-              <label class="modal__label">
-                {{ editingUser?.id ? 'Nueva contraseña (dejar vacío = no cambiar)' : 'Contraseña' }}
-              </label>
-              <input v-model="userForm.password" class="modal__input" type="password" autocomplete="new-password" />
+              <label class="modal__label">Teléfono</label>
+              <input v-model="userForm.telefono" class="modal__input" type="text" />
             </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Dirección</label>
+              <input v-model="userForm.direccion" class="modal__input" type="text" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Fecha de nacimiento</label>
+              <input v-model="userForm.fecha_nacimiento" class="modal__input" type="date" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Biografía</label>
+              <textarea v-model="userForm.biografia" class="modal__textarea" rows="2" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Imagen de perfil (URL)</label>
+              <input v-model="userForm.imagen_perfil" class="modal__input" type="text" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Imagen de banner (URL)</label>
+              <input v-model="userForm.imagen_banner" class="modal__input" type="text" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Cargo</label>
+              <input v-model="userForm.cargo" class="modal__input" type="text" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Sueldo (€)</label>
+              <input v-model="userForm.sueldo" class="modal__input" type="number" step="0.01" min="0" />
+            </div>
+
+            <div class="modal__field">
+              <label class="modal__label">Fecha de contratación</label>
+              <input v-model="userForm.fecha_contratacion" class="modal__input" type="date" />
+            </div>
+
+            <div class="modal__field modal__field--checkbox">
+              <label class="modal__label">
+                <input v-model="userForm.activo" type="checkbox" />
+                Usuario activo
+              </label>
+            </div>
+
           </div>
 
           <div class="modal__footer">
@@ -436,7 +473,7 @@
             <button class="dash-btn dash-btn--ghost" @click="closeModal">Cancelar</button>
             <button class="dash-btn dash-btn--danger-solid" @click="deleteUser" :disabled="saving">
               <span v-if="saving">Eliminando...</span>
-              <span v-else">🗑️ Eliminar</span>
+              <span v-else>🗑️ Eliminar</span>
             </button>
           </div>
         </div>
@@ -454,61 +491,27 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import './admin.css'
 import Navbar from '../components/navbar/Navbar.vue'
+import './admin.css'
 
 import {
-  roleLabel,
-  visibleTabs,
-  canSeeStats,
-  canEditPedidos,
-  isRepartidor,
-  estadoFiltros,
-  todosEstados,
-  estadoIcon,
-  pagoIcon,
-  parseProductos,
-  formatTime,
-  formatDate,
-  useDashboard
+  authRole, authName,
+  isAdmin, isRepartidor,
+  canSeeStats, canEditPedidos,
+  visibleTabs, roleLabel,
+  todosEstados, estadoFiltros,
+  estadoIcon, pagoIcon, parseProductos, formatTime, formatDate,
+  useDashboard,
 } from './admin.js'
 
-// 🔥 USAR EL COMPOSABLE (ESTO ES LO CLAVE)
-const dashboard = useDashboard()
-
-// ─── UI STATE ───────────────────────────────────────────
-const activeTab = ref('pedidos')
-const saving = ref(false)
-
-const filters = reactive({
-  search: '',
-  estado: ''
-})
-
-// ─── EXPONER TODO LO QUE USA EL TEMPLATE ────────────────
 const {
-  stats,
-  usuarios,
-  misEntregas,
-  pendingCount,
-  filteredPedidos,
-  authRole,
-  authName,
-  modal,
-  toast,
-  editForm,
-  userForm,
-  editingPedido,
-  editingUser,
-  deletingUser,
-  cambiarEstado,
-  openEdit,
-  openEditUser,
-  openCreateUser,
-  saveUser,
-  saveEditPedido,
-  deleteUser,
-  closeModal
-} = dashboard
+  activeTab, saving, modal, toast, filters,
+  pedidos, usuarios,
+  editingPedido, editForm,
+  editingUser, deletingUser, userForm,
+  filteredPedidos, misEntregas, pendingCount, stats,
+  cambiarEstado, openEdit, saveEditPedido,
+  openCreateUser, openEditUser, confirmDeleteUser, saveUser, deleteUser,
+  closeModal,
+} = useDashboard()
 </script>

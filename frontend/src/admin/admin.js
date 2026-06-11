@@ -124,10 +124,24 @@ export function useDashboard() {
   const editingUser  = ref(null)
   const deletingUser = ref(null)
   const userForm = reactive({
-    name:     '',
-    email:    '',
-    role:     'cliente',
+    nombre: '',
+    email: '',
     password: '',
+
+    telefono: '',
+    imagen_perfil: '',
+    imagen_banner: '',
+    biografia: '',
+    direccion: '',
+    fecha_nacimiento: '',
+
+    rol: 'usuario',
+    sueldo: '',
+    fecha_contratacion: '',
+    cargo: '',
+    activo: true,
+
+    metodos_pago: []
   })
 
   // Filtros
@@ -186,7 +200,7 @@ export function useDashboard() {
 
   async function fetchPedidos() {
     try {
-      const res  = await fetch('/api/pedidos', { headers: authHeaders() })
+      const res  = await fetch('http://127.0.0.1:8000/api/pedidos', { headers: authHeaders() })
       const data = await res.json()
       pedidos.value = data.data ?? data
     } catch {
@@ -197,7 +211,7 @@ export function useDashboard() {
   async function fetchUsuarios() {
     if (!canSeeUsuarios) return
     try {
-      const res  = await fetch('/api/usuarios', { headers: authHeaders() })
+      const res  = await fetch('http://127.0.0.1:8000/api/usuarios', { headers: authHeaders() })
       const data = await res.json()
       usuarios.value = data.data ?? data
     } catch {
@@ -209,8 +223,8 @@ export function useDashboard() {
 
   async function cambiarEstado(pedido, nuevoEstado) {
     try {
-      const res = await fetch(`/api/pedidos/${pedido.id}`, {
-        method:  'PATCH',
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/pedidos/${pedido.id}`, {
+        method:  'PUT',
         headers: authHeaders(),
         body:    JSON.stringify({ estado: nuevoEstado }),
       })
@@ -238,10 +252,10 @@ export function useDashboard() {
   async function saveEditPedido() {
     saving.value = true
     try {
-      const res = await fetch(`/api/pedidos/${editingPedido.value.id}`, {
-        method:  'PUT',
+      const res = await fetch(`http://127.0.0.1:8000/api/admin/pedidos/${editingPedido.value.id}`, {
+        method: 'PUT',
         headers: authHeaders(),
-        body:    JSON.stringify({ ...editForm }),
+        body: JSON.stringify({ ...editForm }),
       })
       if (!res.ok) throw new Error()
       const updated = await res.json()
@@ -259,15 +273,82 @@ export function useDashboard() {
   // ── Usuarios CRUD ──────────────────────────────────────
 
   function openCreateUser() {
-    editingUser.value = {}
-    Object.assign(userForm, { name: '', email: '', role: 'cliente', password: '' })
+    editingUser.value = null
+
+    Object.assign(userForm, {
+      nombre: '',
+      email: '',
+      password: '',
+      telefono: '',
+      imagen_perfil: '',
+      imagen_banner: '',
+      biografia: '',
+      direccion: '',
+      fecha_nacimiento: '',
+      rol: 'usuario',
+      sueldo: '',
+      fecha_contratacion: '',
+      cargo: '',
+      activo: true,
+      metodos_pago: []
+    })
+
     modal.editUser = true
   }
 
-  function openEditUser(u) {
+  async function openEditUser(u) {
     editingUser.value = u
-    Object.assign(userForm, { name: u.name, email: u.email, role: u.role, password: '' })
     modal.editUser = true
+
+    // Reset mientras carga
+    Object.assign(userForm, {
+      nombre: u.nombre ?? '',
+      email: u.email ?? '',
+      password: '',
+      telefono: '',
+      imagen_perfil: '',
+      imagen_banner: '',
+      biografia: '',
+      direccion: '',
+      fecha_nacimiento: '',
+      rol: u.rol ?? 'usuario',
+      sueldo: '',
+      fecha_contratacion: '',
+      cargo: '',
+      activo: u.activo ?? true,
+      metodos_pago: []
+    })
+
+    try {
+      const res  = await fetch(`http://127.0.0.1:8000/api/usuarios/${u.id}`, { headers: authHeaders() })
+      if (!res.ok) throw new Error()
+      const full = await res.json()
+
+      editingUser.value = full
+
+      Object.assign(userForm, {
+        nombre: full.nombre ?? '',
+        email: full.email ?? '',
+        password: '',
+
+        telefono: full.telefono ?? '',
+        imagen_perfil: full.imagen_perfil ?? '',
+        imagen_banner: full.imagen_banner ?? '',
+        biografia: full.biografia ?? '',
+        direccion: full.direccion ?? '',
+        fecha_nacimiento: full.fecha_nacimiento ? full.fecha_nacimiento.slice(0, 10) : '',
+
+        rol: full.rol ?? 'usuario',
+        sueldo: full.sueldo ?? '',
+        fecha_contratacion: full.fecha_contratacion ? full.fecha_contratacion.slice(0, 10) : '',
+        cargo: full.cargo ?? '',
+        activo: !!full.activo,
+
+        metodos_pago: Array.isArray(full.metodos_pago) ? full.metodos_pago : []
+      })
+    } catch {
+      showToast('Error al cargar datos del usuario', 'error')
+    }
   }
 
   function confirmDeleteUser(u) {
@@ -277,24 +358,47 @@ export function useDashboard() {
 
   async function saveUser() {
     saving.value = true
-    const isNew  = !editingUser.value?.id
-    const url    = isNew ? '/api/usuarios' : `/api/usuarios/${editingUser.value.id}`
+
+    const isNew = !editingUser.value?.id
+    const url = isNew
+      ? 'http://127.0.0.1:8000/api/usuarios'
+      : `http://127.0.0.1:8000/api/usuarios/${editingUser.value.id}`
+
     const method = isNew ? 'POST' : 'PUT'
-    const body   = { ...userForm }
+
+    const body = {
+      ...userForm,
+      sueldo: userForm.sueldo === '' ? null : userForm.sueldo,
+      fecha_nacimiento: userForm.fecha_nacimiento || null,
+      fecha_contratacion: userForm.fecha_contratacion || null,
+      metodos_pago: Array.isArray(userForm.metodos_pago)
+        ? userForm.metodos_pago
+        : []
+    }
+
     if (!isNew && !body.password) delete body.password
 
     try {
-      const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) })
+      const res = await fetch(url, {
+        method,
+        headers: authHeaders(),
+        body: JSON.stringify(body)
+      })
+
       if (!res.ok) throw new Error()
+
       const saved = await res.json()
+
       if (isNew) {
         usuarios.value.unshift(saved)
       } else {
         const idx = usuarios.value.findIndex(u => u.id === editingUser.value.id)
         if (idx !== -1) usuarios.value[idx] = { ...usuarios.value[idx], ...saved }
       }
+
       showToast(isNew ? 'Usuario creado' : 'Usuario actualizado')
       closeModal()
+
     } catch {
       showToast('Error al guardar usuario', 'error')
     } finally {
@@ -305,7 +409,7 @@ export function useDashboard() {
   async function deleteUser() {
     saving.value = true
     try {
-      const res = await fetch(`/api/usuarios/${deletingUser.value.id}`, {
+      const res = await fetch(`http://127.0.0.1:8000/api/usuarios/${deletingUser.value.id}`, {
         method: 'DELETE', headers: authHeaders(),
       })
       if (!res.ok) throw new Error()
